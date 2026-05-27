@@ -1,0 +1,2160 @@
+/* =============================================================================
+   FITREP Evaluator - Professional Polish Layer
+   Phase 2B, 2C, 2D, 2E in one file. Loads AFTER styles.css and AFTER
+   poc-header.css so token-driven rules override legacy hardcoded styles.
+
+   Strategy: high-specificity selectors prefixed with .container or :where
+   constructs that beat single-class selectors in styles.css.
+
+   Contents:
+   - 2B: Token-driven overrides for cards, modals, inputs, surfaces.
+   - 2C: Button system mapped to brand and semantic tokens.
+   - 2D: Animations and transitions using Semper motion tokens.
+   - 2E: Focus-visible everywhere, reduced-motion gate, icon sizing.
+   ============================================================================= */
+
+/* =========================================================================
+   PHASE 2E - Foundation: SVG icon sizing and accessibility
+   ========================================================================= */
+
+.icon {
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+  /* Default size for icons without a modifier. Inherits from surrounding text size. */
+  width: 1em;
+  height: 1em;
+}
+
+.icon--xs { width: 12px !important; height: 12px !important; }
+.icon--sm { width: 14px !important; height: 14px !important; }
+.icon--md { width: 16px !important; height: 16px !important; }
+.icon--lg { width: 20px !important; height: 20px !important; }
+.icon--xl { width: 24px !important; height: 24px !important; }
+.icon--2xl { width: 32px !important; height: 32px !important; }
+.icon--3xl { width: 48px !important; height: 48px !important; }
+
+/* Universal focus-visible treatment */
+.container :focus-visible,
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid var(--color-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* =========================================================================
+   PHASE 2B - Card and surface overrides
+   ========================================================================= */
+
+.container .setup-card,
+.container .profile-card,
+.container .summary-card,
+.container .review-card,
+.container .section-i-generation-card,
+.container .directed-comments-card,
+.container .help-content,
+.container .help-modal,
+.container .info-card {
+  background: var(--color-card);
+  color: var(--color-foreground);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-6);
+  transition: box-shadow var(--motion-default) var(--easing-out),
+              border-color var(--motion-default) var(--easing-out),
+              transform var(--motion-default) var(--easing-out);
+}
+
+/* Dark mode coverage for all major content cards - explicit hex to overcome
+   any legacy specificity. */
+body.dark .container .setup-card,
+body.dark .container .profile-card,
+body.dark .container .summary-card,
+body.dark .container .review-card,
+body.dark .container .section-i-generation-card,
+body.dark .container .directed-comments-card,
+body.dark .container .help-content,
+body.dark .container .help-modal,
+body.dark .container .info-card {
+  background: #11203F !important;
+  color: #F2E5BE !important;
+  border-color: #233A5C !important;
+}
+
+/* Force every direct h2 inside these cards to high-contrast foreground in
+   dark mode. Beats inline style="color: #1e3c72" via class specificity. */
+body.dark .container .setup-card h2,
+body.dark .container .profile-card h2,
+body.dark .container .summary-card h2,
+body.dark .container .review-card h2,
+body.dark .container .section-i-generation-card h2,
+body.dark .container .directed-comments-card h2,
+body.dark .container h2[style*="color"],
+body.dark .container h3[style*="color"],
+body.dark .container h4[style*="color"] {
+  color: #F2E5BE !important;
+}
+
+body.dark .container .setup-card h3,
+body.dark .container .profile-card h3,
+body.dark .container .summary-card h3,
+body.dark .container .review-card h3,
+body.dark .container .section-i-generation-card h3,
+body.dark .container .directed-comments-card h3 {
+  color: #F2E5BE !important;
+}
+
+/* =========================================================================
+   APPLY SECTION-I CARD SURFACE TO INNER ELEMENTS
+   User feedback: the .section-i-generation-card background and chrome reads
+   well. Promote the same treatment to .review-section, .selected-comments-
+   section, .grade-group-content, and .fitrep-average so the whole app feels
+   cohesive instead of mixing nested card styles.
+   ========================================================================= */
+
+.container .review-section,
+.container .selected-comments-section,
+.container .selected-comments-section.active,
+.container .grade-group-content,
+.container .fitrep-average {
+  background: var(--color-card) !important;
+  background-image: none !important;
+  color: var(--color-foreground) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-card) !important;
+  padding: var(--space-4) var(--space-6) !important;
+  margin: var(--space-3) 0 !important;
+}
+
+body.dark .container .review-section,
+body.dark .container .selected-comments-section,
+body.dark .container .selected-comments-section.active,
+body.dark .container .grade-group-content,
+body.dark .container .fitrep-average {
+  background: #11203F !important;
+  color: #F2E5BE !important;
+  border-color: #233A5C !important;
+}
+
+/* FITREP Average gets the card surface but keeps its display typography. */
+.container .fitrep-average {
+  font-family: var(--font-display) !important;
+  font-size: var(--text-4xl) !important;
+  color: var(--color-usmc-scarlet) !important;
+  text-align: center !important;
+  line-height: 1.1 !important;
+  letter-spacing: 0.02em !important;
+  padding: var(--space-4) var(--space-6) !important;
+}
+
+body.dark .container .fitrep-average {
+  color: var(--color-usmc-scarlet-300) !important;
+}
+
+/* Inner h3 headings inside the new card surfaces */
+.container .review-section h3,
+.container .selected-comments-section h3,
+.container .grade-group-content h3 {
+  color: var(--color-foreground) !important;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: var(--text-lg);
+  margin-bottom: var(--space-3);
+  letter-spacing: -0.005em;
+}
+
+body.dark .container .review-section h3,
+body.dark .container .selected-comments-section h3,
+body.dark .container .grade-group-content h3 {
+  color: #F2E5BE !important;
+}
+
+/* Inner intro paragraphs */
+.container .selected-comments-section > p {
+  color: var(--color-muted-foreground) !important;
+  margin-bottom: var(--space-3);
+}
+
+body.dark .container .selected-comments-section > p {
+  color: var(--color-muted-foreground) !important;
+}
+
+/* Section title heading inside review-section (the section name in caps) */
+.container .review-section .review-section-title {
+  font-family: var(--font-display) !important;
+  font-size: var(--text-xl) !important;
+  color: var(--color-foreground) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.03em !important;
+  border-bottom: 1px solid var(--color-border) !important;
+  padding-bottom: var(--space-2) !important;
+  margin-bottom: var(--space-3) !important;
+}
+
+body.dark .container .review-section .review-section-title {
+  color: #F2E5BE !important;
+  border-bottom-color: #233A5C !important;
+}
+
+/* Grade-group-content: scrollable inner area override - remove the legacy
+   max-height so cards size to content within the new card surface. */
+.container .grade-group-content {
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+.container .setup-card,
+.container .profile-card {
+  animation: pocFadeSlideIn var(--motion-slow) var(--easing-out);
+}
+
+.container .setup-title,
+.container .profile-title {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  color: var(--color-foreground);
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: var(--space-4);
+  line-height: 1.1;
+}
+
+.container .profile-description {
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  color: var(--color-muted-foreground);
+  text-align: center;
+  margin-bottom: var(--space-6);
+  line-height: 1.5;
+}
+
+.container .info-card-title,
+.container .result-box-title {
+  font-family: var(--font-body);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--color-foreground);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+  letter-spacing: -0.005em;
+}
+
+.container .info-card-title .icon,
+.container .result-box-title .icon {
+  color: var(--color-usmc-scarlet);
+}
+
+.container .result-box {
+  background: color-mix(in srgb, var(--color-usmc-scarlet) 6%, var(--color-card));
+  border: 1px solid color-mix(in srgb, var(--color-usmc-scarlet) 22%, transparent);
+  border-left: 4px solid var(--color-usmc-scarlet);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-6);
+}
+
+.container .result-box-title .icon {
+  color: var(--color-brass);
+}
+
+/* =========================================================================
+   PHASE 2B - Form input overrides
+   ========================================================================= */
+
+.container .form-input,
+.container .setup-select,
+.container .form-input[type="text"],
+.container .form-input[type="email"],
+.container .form-input[type="password"],
+.container .form-input[type="number"],
+.container .form-input[type="search"],
+.container input.form-input,
+.container select.form-input,
+.container textarea.form-input {
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  color: var(--color-foreground);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  transition: border-color var(--motion-fast) var(--easing-out),
+              box-shadow var(--motion-fast) var(--easing-out),
+              background var(--motion-fast) var(--easing-out);
+  width: 100%;
+}
+
+.container .form-input:hover,
+.container .setup-select:hover {
+  border-color: var(--color-border-strong);
+}
+
+.container .form-input:focus,
+.container .setup-select:focus,
+.container .form-input:focus-visible,
+.container .setup-select:focus-visible {
+  outline: none;
+  border-color: var(--color-usmc-scarlet);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-usmc-scarlet) 18%, transparent);
+}
+
+.container .form-label {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-foreground);
+  display: block;
+  margin-bottom: 6px;
+  letter-spacing: 0.01em;
+}
+
+.container .form-group {
+  margin-bottom: var(--space-4);
+}
+
+.container .input-hint {
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  color: var(--color-muted-foreground);
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+/* =========================================================================
+   PHASE 2C - Button system
+   ========================================================================= */
+
+.container .btn,
+.container button.btn,
+.container .generation-btn,
+.container .mode-option-btn,
+.container .help-close,
+.container button[type="button"]:where(.btn-meets, .btn-secondary, .btn-primary, .btn-export, .btn-third) {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 600;
+  border-radius: var(--radius-button);
+  padding: 10px 18px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  letter-spacing: 0.005em;
+  line-height: 1.2;
+  transition: background var(--motion-fast) var(--easing-out),
+              border-color var(--motion-fast) var(--easing-out),
+              color var(--motion-fast) var(--easing-out),
+              transform var(--motion-fast) var(--easing-out),
+              box-shadow var(--motion-fast) var(--easing-out);
+}
+
+.container .btn:disabled,
+.container button.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Primary - scarlet on light, brighter scarlet on dark */
+.container .btn-meets,
+.container .btn-primary,
+.container .generation-btn.primary {
+  background: var(--color-primary);
+  color: var(--color-primary-foreground);
+  border-color: var(--color-primary);
+}
+.container .btn-meets:hover,
+.container .btn-primary:hover,
+.container .generation-btn.primary:hover {
+  background: var(--color-usmc-scarlet-700);
+  border-color: var(--color-usmc-scarlet-700);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+.container .btn-meets:active,
+.container .btn-primary:active,
+.container .generation-btn.primary:active {
+  transform: translateY(0);
+}
+
+/* Secondary - outline ghost */
+.container .btn-secondary,
+.container .generation-btn:not(.primary) {
+  background: transparent;
+  color: var(--color-foreground);
+  border-color: var(--color-border-strong);
+}
+.container .btn-secondary:hover,
+.container .generation-btn:not(.primary):hover {
+  background: var(--color-muted);
+  border-color: var(--color-foreground);
+}
+
+/* Export - brass accent */
+.container .btn-export {
+  background: var(--color-accent);
+  color: var(--color-accent-foreground);
+  border-color: var(--color-accent);
+}
+.container .btn-export:hover {
+  background: var(--color-brass-700);
+  border-color: var(--color-brass-700);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Tertiary - subtle */
+.container .btn-third {
+  background: var(--color-surface-2);
+  color: var(--color-foreground);
+  border-color: var(--color-border);
+}
+.container .btn-third:hover {
+  background: var(--color-surface-3);
+}
+
+/* Help close (X button) */
+.container .help-close {
+  background: transparent;
+  border: none;
+  color: var(--color-muted-foreground);
+  font-size: var(--text-2xl);
+  padding: 4px 12px;
+  border-radius: var(--radius-sm);
+}
+.container .help-close:hover {
+  background: var(--color-muted);
+  color: var(--color-foreground);
+}
+
+/* =========================================================================
+   PHASE 2C - Mode selection card
+   ========================================================================= */
+
+.container .mode-options {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+  margin: var(--space-4) auto;
+  max-width: 480px;
+}
+
+.container .mode-option-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-6);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  text-align: center;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: border-color var(--motion-fast) var(--easing-out),
+              transform var(--motion-fast) var(--easing-out),
+              box-shadow var(--motion-fast) var(--easing-out),
+              background var(--motion-fast) var(--easing-out);
+}
+.container .mode-option-btn:hover {
+  border-color: var(--color-usmc-scarlet);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  background: color-mix(in srgb, var(--color-usmc-scarlet) 4%, var(--color-surface));
+}
+.container .mode-option-btn .mode-icon {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-usmc-scarlet) 10%, transparent);
+  color: var(--color-usmc-scarlet);
+}
+.container .mode-option-btn .mode-icon .icon {
+  width: 32px;
+  height: 32px;
+}
+.container .mode-option-btn .mode-title {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--color-foreground);
+}
+.container .mode-option-btn .mode-description {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-muted-foreground);
+  line-height: 1.4;
+}
+
+/* =========================================================================
+   PHASE 2C - Decision boxes (three-choice grid)
+   ========================================================================= */
+
+.container .decision-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+.container .decision-box {
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  text-align: center;
+  border: 1px solid var(--color-border);
+  transition: transform var(--motion-fast) var(--easing-out),
+              box-shadow var(--motion-fast) var(--easing-out);
+}
+.container .decision-box:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+.container .decision-not-meet {
+  background: color-mix(in srgb, var(--color-status-stale) 8%, var(--color-card));
+  border-color: color-mix(in srgb, var(--color-status-stale) 30%, transparent);
+}
+.container .decision-meets {
+  background: color-mix(in srgb, var(--color-status-fresh) 8%, var(--color-card));
+  border-color: color-mix(in srgb, var(--color-status-fresh) 30%, transparent);
+}
+.container .decision-surpasses {
+  background: color-mix(in srgb, var(--color-status-info) 8%, var(--color-card));
+  border-color: color-mix(in srgb, var(--color-status-info) 30%, transparent);
+}
+.container .decision-title-not-meet {
+  color: var(--color-status-stale);
+  font-family: var(--font-body);
+  font-weight: 700;
+}
+.container .decision-title-meets {
+  color: var(--color-status-fresh);
+  font-family: var(--font-body);
+  font-weight: 700;
+}
+.container .decision-title-surpasses {
+  color: var(--color-status-info);
+  font-family: var(--font-body);
+  font-weight: 700;
+}
+
+/* =========================================================================
+   PHASE 2B - Modals
+   ========================================================================= */
+
+.container .help-modal,
+.help-modal {
+  background: rgba(10, 20, 36, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.container .help-content,
+.help-modal .help-content {
+  background: var(--color-card);
+  color: var(--color-foreground);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  animation: pocModalEntry var(--motion-default) var(--easing-out);
+}
+
+/* Info icon button used in form labels */
+.container .info-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  margin-left: 6px;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-chip);
+  color: var(--color-muted-foreground);
+  cursor: pointer;
+  transition: background var(--motion-fast) var(--easing-out),
+              color var(--motion-fast) var(--easing-out),
+              border-color var(--motion-fast) var(--easing-out);
+}
+.container .info-icon:hover {
+  background: var(--color-muted);
+  color: var(--color-foreground);
+  border-color: var(--color-border-strong);
+}
+.container .info-icon .icon {
+  width: 12px;
+  height: 12px;
+}
+
+/* =========================================================================
+   PHASE 2D - Animations
+   ========================================================================= */
+
+@keyframes pocFadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pocModalEntry {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pocFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes pocPulseAccent {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-usmc-scarlet) 30%, transparent); }
+  50% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--color-usmc-scarlet) 0%, transparent); }
+}
+
+/* =========================================================================
+   PHASE 2E - Reduced motion
+   ========================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .container .setup-card,
+  .container .profile-card,
+  .container .summary-card,
+  .container .mode-option-btn,
+  .container .btn,
+  .container button,
+  .container .help-content {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* =========================================================================
+   PHASE 2B - Section I generation buttons inline icon style
+   ========================================================================= */
+
+.container .generation-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  justify-content: center;
+  margin-top: var(--space-4);
+}
+
+.container .generation-btn {
+  min-width: 180px;
+}
+
+/* =========================================================================
+   PHASE 2B - Disclaimer modal polish
+   ========================================================================= */
+
+.sa-modal .sa-modal-content {
+  background: var(--color-card);
+  color: var(--color-foreground);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+}
+
+/* =========================================================================
+   PHASE 2B - Headers inside help and info content
+   ========================================================================= */
+
+.container .help-content h3,
+.container .help-content h4 {
+  font-family: var(--font-body);
+  font-weight: 700;
+  color: var(--color-foreground);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  letter-spacing: -0.005em;
+  margin-bottom: var(--space-2);
+  background: none !important;
+}
+.container .help-content h3 {
+  font-size: var(--text-lg);
+}
+.container .help-content h4 {
+  font-size: var(--text-md);
+}
+.container .help-content h3 .icon,
+.container .help-content h4 .icon {
+  color: var(--color-usmc-scarlet);
+}
+
+/* =========================================================================
+   PoC Footer - overrides styles.css display: none on .disclaimer-footer
+   ========================================================================= */
+
+footer.poc-footer.disclaimer-footer,
+.poc-footer.disclaimer-footer {
+  display: block !important;
+  background: var(--color-bg-sunken);
+  color: var(--color-muted-foreground);
+  border-top: 2px solid var(--color-usmc-scarlet);
+  padding: 8px var(--space-6);
+  margin-top: var(--space-8);
+  font-family: var(--font-body);
+}
+
+.poc-footer__content {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.poc-footer__body {
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  color: var(--color-muted-foreground);
+  margin: 0;
+  line-height: 1.3;
+  text-align: center;
+}
+
+@media (max-width: 720px) {
+  .poc-footer__body {
+    line-height: 1.4;
+    font-size: 11px;
+  }
+}
+
+/* =========================================================================
+   Help button in header info row
+   ========================================================================= */
+
+#stickyChrome .header-link.header-link--button,
+#stickyChrome button.header-link {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-foreground);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  transition: color var(--motion-fast) var(--easing-out),
+              background var(--motion-fast) var(--easing-out);
+}
+
+#stickyChrome .header-link.header-link--button:hover,
+#stickyChrome button.header-link:hover {
+  color: var(--color-usmc-scarlet);
+  background: color-mix(in srgb, var(--color-usmc-scarlet) 8%, transparent);
+}
+
+#stickyChrome .header-link.header-link--button .link-icon {
+  color: var(--color-marine-blue);
+}
+
+body.dark #stickyChrome .header-link.header-link--button .link-icon {
+  color: var(--color-marine-blue-100);
+}
+
+/* =========================================================================
+   Suppress any legacy floating .help-button styles in styles.css
+   ========================================================================= */
+
+button#helpButton.help-button {
+  /* Reset the floating treatment. The button now lives inside the sticky header
+     and is styled via .header-link rules above. This override neutralizes the
+     fixed-position floating "?" treatment in styles.css. */
+  position: static !important;
+  width: auto !important;
+  height: auto !important;
+  bottom: auto !important;
+  right: auto !important;
+  border-radius: var(--radius-sm) !important;
+  box-shadow: none !important;
+}
+
+/* =========================================================================
+   PHASE 2B/2C deeper push - trait evaluation surfaces
+   ========================================================================= */
+
+/* Trait evaluation grade options */
+.container .grade-option,
+.container .trait-evaluation-card,
+.container .evaluation-card {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-foreground);
+  transition: border-color var(--motion-fast) var(--easing-out),
+              background var(--motion-fast) var(--easing-out),
+              transform var(--motion-fast) var(--easing-out),
+              box-shadow var(--motion-fast) var(--easing-out);
+}
+
+.container .grade-option:hover {
+  border-color: var(--color-usmc-scarlet);
+  background: color-mix(in srgb, var(--color-usmc-scarlet) 4%, var(--color-card));
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.container .grade-option.selected,
+.container .grade-option.active {
+  border-color: var(--color-usmc-scarlet);
+  background: color-mix(in srgb, var(--color-usmc-scarlet) 10%, var(--color-card));
+}
+
+.container .grade-letter,
+.container .grade-label {
+  font-family: var(--font-display);
+  color: var(--color-foreground);
+}
+
+.container .grade-description {
+  font-family: var(--font-body);
+  color: var(--color-muted-foreground);
+  font-size: var(--text-sm);
+}
+
+/* Justification modal */
+.container .justification-modal,
+.justification-modal {
+  background: rgba(10, 20, 36, 0.55);
+  backdrop-filter: blur(8px);
+}
+
+.container .justification-content,
+.justification-modal .justification-content {
+  background: var(--color-card);
+  color: var(--color-foreground);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  animation: pocModalEntry var(--motion-default) var(--easing-out);
+}
+
+.container textarea.form-input,
+.container #justificationText,
+.container #sectionITextarea {
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  line-height: 1.5;
+  background: var(--color-surface);
+  color: var(--color-foreground);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  min-height: 120px;
+  resize: vertical;
+  transition: border-color var(--motion-fast) var(--easing-out),
+              box-shadow var(--motion-fast) var(--easing-out);
+}
+
+.container textarea.form-input:focus,
+.container #justificationText:focus,
+.container #sectionITextarea:focus {
+  outline: none;
+  border-color: var(--color-usmc-scarlet);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-usmc-scarlet) 18%, transparent);
+}
+
+/* Word count display */
+.container #wordCount,
+.container .word-count {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-muted-foreground);
+}
+
+/* Validation panel */
+.container .validation-panel {
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-status-info);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  margin: var(--space-3) 0;
+  color: var(--color-foreground);
+  font-family: var(--font-body);
+}
+
+.container .validation-warning {
+  border-left-color: var(--color-status-aging);
+}
+
+.container .validation-error {
+  border-left-color: var(--color-status-stale);
+}
+
+.container .validation-success {
+  border-left-color: var(--color-status-fresh);
+}
+
+.container .validation-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  color: var(--color-status-fresh);
+}
+
+/* Summary card and trait results */
+.container .summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-3);
+  margin: var(--space-4) 0;
+}
+
+.container .fitrep-average {
+  font-family: var(--font-display);
+  font-size: var(--text-5xl);
+  color: var(--color-usmc-scarlet);
+  text-align: center;
+  line-height: 1;
+  margin: var(--space-4) 0;
+  letter-spacing: 0.02em;
+}
+
+.container .summary-trait-card {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  transition: transform var(--motion-fast) var(--easing-out),
+              box-shadow var(--motion-fast) var(--easing-out);
+}
+
+.container .summary-trait-card:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Accordion (completed traits) */
+.container .completed-traits-accordion {
+  margin: var(--space-4) 0;
+}
+
+.container .accordion-item {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-card);
+  margin-bottom: var(--space-2);
+  overflow: hidden;
+  transition: border-color var(--motion-fast) var(--easing-out);
+}
+
+.container .accordion-item:hover {
+  border-color: var(--color-border-strong);
+}
+
+.container .accordion-header,
+.container .accordion-section-header {
+  font-family: var(--font-body);
+  font-weight: 600;
+  color: var(--color-foreground);
+  padding: var(--space-3) var(--space-4);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--color-surface-2);
+}
+
+.container .accordion-trait-item {
+  padding: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
+.container .accordion-trait-name {
+  font-family: var(--font-body);
+  font-weight: 600;
+  color: var(--color-foreground);
+}
+
+.container .accordion-grade-desc {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.container .accordion-trait-justification {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-muted-foreground);
+  margin-top: var(--space-1);
+  line-height: 1.5;
+}
+
+.container .accordion-edit-btn {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-foreground);
+  padding: 4px 10px;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  margin-top: var(--space-2);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background var(--motion-fast) var(--easing-out),
+              border-color var(--motion-fast) var(--easing-out);
+}
+
+.container .accordion-edit-btn:hover {
+  background: var(--color-muted);
+  border-color: var(--color-border-strong);
+}
+
+/* Tooltips */
+.container .tooltip-content,
+#gridTooltip {
+  background: var(--color-foreground);
+  color: var(--color-background);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  max-width: 320px;
+  line-height: 1.4;
+}
+
+/* Disclaimer modal */
+.container #disclaimer-modal .sa-modal-content,
+#disclaimer-modal .sa-modal-content {
+  background: var(--color-card);
+  color: var(--color-foreground);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-6);
+  animation: pocModalEntry var(--motion-default) var(--easing-out);
+}
+
+/* Promotion endorsement adverse and addendum notices */
+.container .addendum-notice,
+.container .adverse-notice {
+  background: color-mix(in srgb, var(--color-status-aging) 12%, var(--color-card));
+  border: 1px solid color-mix(in srgb, var(--color-status-aging) 35%, transparent);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-3);
+  color: var(--color-status-aging);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: var(--space-2);
+}
+
+.container .adverse-notice {
+  background: color-mix(in srgb, var(--color-status-stale) 12%, var(--color-card));
+  border-color: color-mix(in srgb, var(--color-status-stale) 35%, transparent);
+  color: var(--color-status-stale);
+}
+
+/* Auto-save indicator */
+.container .auto-save-indicator {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-muted-foreground);
+}
+
+.container .auto-save-indicator .icon {
+  width: 12px;
+  height: 12px;
+  color: var(--color-status-fresh);
+}
+
+/* Body background override - kill the styles.css blue gradient so the page
+   reads as a single parchment surface (light) or dark navy (dark). Uses
+   explicit hex values in addition to tokens so the dark mode override
+   cannot be lost to a variable resolution edge case. */
+html, body {
+  background: #F8F4E8 !important;
+  background-image: none !important;
+  min-height: 100vh;
+  color: var(--color-foreground);
+  font-family: var(--font-body);
+  margin: 0;
+  padding: 0;
+}
+
+html.dark,
+body.dark,
+.dark body,
+body.dark html,
+html:has(body.dark) {
+  background: #0A1424 !important;
+  background-color: #0A1424 !important;
+  background-image: none !important;
+  color: #F2E5BE !important;
+}
+
+body.dark .container,
+.dark .container {
+  background: transparent !important;
+  color: #F2E5BE !important;
+}
+
+/* Container constraint - no background, just layout. Sits on top of body
+   which carries the surface color. No visual seam between the two. */
+.container {
+  background: transparent !important;
+  color: var(--color-foreground);
+  padding: var(--space-6);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (max-width: 720px) {
+  .container {
+    padding: var(--space-3);
+  }
+}
+
+/* Override styles.css .container { max-width: 900px; padding: 20px 20px 10px 20px; } */
+body .container {
+  max-width: 1200px;
+}
+
+/* Override styles.css .header background: white rounded card treatment.
+   Our sticky chrome handles the header now and we do NOT want a second
+   white card showing inside the sticky chrome. */
+#stickyChrome .header {
+  background: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  margin-bottom: 0 !important;
+}
+
+/* =========================================================================
+   DARK MODE CONTRAST OVERRIDES
+   Inline color styles in index.html lock to light-mode hex values that
+   become unreadable on the dark navy background. These attribute selectors
+   force the inline values to use tokens that respond to the .dark class.
+   ========================================================================= */
+
+/* Override inline color: #1e3c72 (dark blue heading) */
+body.dark [style*="color: #1e3c72"],
+body.dark [style*="color:#1e3c72"] {
+  color: var(--color-marine-blue-100) !important;
+}
+
+/* Override inline color: #666 (muted gray paragraph) */
+body.dark [style*="color: #666"],
+body.dark [style*="color:#666"] {
+  color: var(--color-muted-foreground) !important;
+}
+
+/* Override inline color: #d32f2f (red destructive label) */
+body.dark [style*="color: #d32f2f"],
+body.dark [style*="color:#d32f2f"] {
+  color: var(--color-usmc-scarlet-300) !important;
+}
+
+/* Override inline color: #2e7d32 (green success) */
+body.dark [style*="color: #2e7d32"],
+body.dark [style*="color:#2e7d32"] {
+  color: var(--color-status-fresh) !important;
+}
+
+/* Override inline color: #1976d2 (info blue) */
+body.dark [style*="color: #1976d2"],
+body.dark [style*="color:#1976d2"] {
+  color: var(--color-marine-blue-100) !important;
+}
+
+/* Override inline color: #1565c0 (deeper info blue) */
+body.dark [style*="color: #1565c0"],
+body.dark [style*="color:#1565c0"] {
+  color: var(--color-marine-blue-100) !important;
+}
+
+/* Override the PoC constraint hint that uses inline #b71c1c */
+body.dark [style*="color: #b71c1c"],
+body.dark [style*="color:#b71c1c"] {
+  color: var(--color-usmc-scarlet-300) !important;
+}
+
+/* Light mode also benefits from token mapping on these heading colors so
+   the brand scarlet/marine blue replaces the legacy palette consistently. */
+.container [style*="color: #1e3c72"],
+.container [style*="color:#1e3c72"] {
+  color: var(--color-marine-blue) !important;
+}
+
+.container [style*="color: #666"],
+.container [style*="color:#666"] {
+  color: var(--color-muted-foreground) !important;
+}
+
+.container [style*="color: #1565c0"],
+.container [style*="color:#1565c0"] {
+  color: var(--color-marine-blue) !important;
+}
+
+/* Strengthen dark-mode foreground on body to overcome any styles.css color:#333
+   that did not get specific override. */
+body.dark,
+body.dark .container,
+body.dark .setup-card,
+body.dark .profile-card,
+body.dark .summary-card,
+body.dark .section-i-generation-card,
+body.dark .directed-comments-card,
+body.dark .review-card {
+  color: var(--color-foreground);
+}
+
+/* Form input dark mode contrast */
+body.dark .container .form-input,
+body.dark .container .setup-select,
+body.dark .container input.form-input,
+body.dark .container select.form-input,
+body.dark .container textarea.form-input,
+body.dark .container input[type="text"],
+body.dark .container input[type="email"],
+body.dark .container input[type="password"],
+body.dark .container input[type="date"],
+body.dark .container input[type="number"] {
+  background: var(--color-surface) !important;
+  color: var(--color-foreground) !important;
+  border-color: var(--color-border) !important;
+}
+
+body.dark .container .form-input::placeholder,
+body.dark .container textarea::placeholder {
+  color: var(--color-subtle-foreground);
+  opacity: 0.7;
+}
+
+/* Form labels stay legible */
+body.dark .container .form-label,
+body.dark .container label {
+  color: var(--color-foreground) !important;
+}
+
+/* Decision boxes - the legacy inline background colors need dark-mode tinting */
+body.dark .container .decision-box {
+  color: var(--color-foreground);
+}
+
+/* All paragraphs and text by default should inherit foreground.
+   Override styles.css color: #333 on body which prints poorly in dark mode. */
+body.dark p,
+body.dark li,
+body.dark span:not(.icon):not(.required-indicator):not([class*="header"]):not([class*="banner"]),
+body.dark div:not(.icon):not([class*="header"]):not([class*="banner"]) {
+  /* Inherit from parent; this just ensures none of styles.css color:#333 leaks. */
+}
+
+body.dark {
+  color: var(--color-foreground);
+}
+
+/* Strong text in dark mode must remain bright */
+body.dark strong,
+body.dark b {
+  color: var(--color-foreground);
+}
+
+/* Override the styles.css color:#333 globally for dark mode */
+body.dark[style*="color"],
+body.dark *[style*="color: #333"],
+body.dark *[style*="color:#333"] {
+  color: var(--color-foreground) !important;
+}
+
+/* Disclaimer modal and any sa-modal text */
+body.dark .sa-modal .sa-modal-content,
+body.dark #disclaimer-modal .sa-modal-content {
+  color: var(--color-foreground);
+}
+
+body.dark .sa-modal .sa-modal-content p,
+body.dark .sa-modal .sa-modal-content h1,
+body.dark .sa-modal .sa-modal-content h2,
+body.dark .sa-modal .sa-modal-content h3 {
+  color: var(--color-foreground) !important;
+}
+
+/* Required indicator (asterisk) should be scarlet in both modes */
+.container .required-indicator,
+.container .required *::after {
+  color: var(--color-usmc-scarlet);
+}
+
+body.dark .container .required-indicator {
+  color: var(--color-usmc-scarlet-300) !important;
+}
+
+/* =========================================================================
+   BIAS PREVENTION - Unify grade display and criteria coloring
+   The legacy styles.css used red/orange for below-standards, blue for
+   acceptable, green for excellent. Those color signals telegraph the value
+   of the response before the evaluator reads it. All grade-display variants
+   and all review-criteria variants now render with the same neutral
+   surface treatment in both light and dark mode. Only the text content
+   differs.
+   ========================================================================= */
+
+/* Grade display block shown during evaluation - all variants render identically */
+.container .grade-display,
+.container .grade-display.adverse,
+.container .grade-display.below-standards,
+.container .grade-display.acceptable,
+.container .grade-display.excellent {
+  background: var(--color-surface-2) !important;
+  background-image: none !important;
+  color: var(--color-foreground) !important;
+  border: 1px solid var(--color-border) !important;
+  border-left: 4px solid var(--color-border-strong) !important;
+  border-radius: var(--radius-md) !important;
+  padding: var(--space-4) !important;
+  margin: var(--space-4) 0 !important;
+  text-align: center !important;
+  box-shadow: none !important;
+}
+
+body.dark .container .grade-display,
+body.dark .container .grade-display.adverse,
+body.dark .container .grade-display.below-standards,
+body.dark .container .grade-display.acceptable,
+body.dark .container .grade-display.excellent {
+  background: var(--color-surface-2) !important;
+  background-image: none !important;
+  color: var(--color-foreground) !important;
+  border-color: var(--color-border) !important;
+  border-left-color: var(--color-border-strong) !important;
+}
+
+.container .grade-display .grade-description,
+.container .grade-display.adverse .grade-description,
+.container .grade-display.below-standards .grade-description,
+.container .grade-display.acceptable .grade-description,
+.container .grade-display.excellent .grade-description {
+  color: var(--color-foreground) !important;
+  font-style: italic !important;
+  line-height: 1.5 !important;
+}
+
+/* Review-page criteria boxes - same bias prevention treatment */
+.container .criteria-meets,
+.container .criteria-does-not-meet,
+.container .criteria-surpasses,
+.container .criteria-unavailable {
+  background: var(--color-surface-2) !important;
+  background-image: none !important;
+  color: var(--color-foreground) !important;
+  border: 1px solid var(--color-border) !important;
+  border-left: 4px solid var(--color-border-strong) !important;
+  border-radius: var(--radius-sm) !important;
+  padding: var(--space-3) !important;
+  margin-bottom: var(--space-2) !important;
+}
+
+.container .criteria-meets strong,
+.container .criteria-does-not-meet strong,
+.container .criteria-surpasses strong,
+.container .criteria-unavailable strong {
+  color: var(--color-foreground) !important;
+  font-weight: 700;
+}
+
+body.dark .container .criteria-meets,
+body.dark .container .criteria-does-not-meet,
+body.dark .container .criteria-surpasses,
+body.dark .container .criteria-unavailable {
+  background: var(--color-surface-2) !important;
+  background-image: none !important;
+  color: var(--color-foreground) !important;
+  border-color: var(--color-border) !important;
+  border-left-color: var(--color-border-strong) !important;
+}
+
+body.dark .container .criteria-meets strong,
+body.dark .container .criteria-does-not-meet strong,
+body.dark .container .criteria-surpasses strong,
+body.dark .container .criteria-unavailable strong {
+  color: var(--color-foreground) !important;
+}
+
+/* Review trait card surfaces */
+.container .review-trait-item {
+  background: var(--color-card);
+  color: var(--color-foreground);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.container .review-trait-name {
+  color: var(--color-foreground) !important;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: var(--text-lg);
+}
+
+.container .review-trait-justification {
+  background: var(--color-surface) !important;
+  color: var(--color-foreground) !important;
+  border-left: 3px solid var(--color-border-strong) !important;
+}
+
+body.dark .container .review-trait-justification {
+  background: var(--color-surface) !important;
+  color: var(--color-foreground) !important;
+  border-left-color: var(--color-border-strong) !important;
+}
+
+.container .review-section-title {
+  color: var(--color-foreground) !important;
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+/* =========================================================================
+   DARK MODE HEADING CONTRAST - broad override
+   Inline style="color: #1e3c72" on h2 and h3 elements rendered low-contrast
+   blue on the dark navy background. Override all container headings in dark
+   mode to use the foreground parchment color directly. Maximum contrast.
+   ========================================================================= */
+
+body.dark .container h1,
+body.dark .container h2,
+body.dark .container h3,
+body.dark .container h4,
+body.dark .container h5,
+body.dark .container h6,
+body.dark .container [style*="color: #1e3c72"],
+body.dark .container [style*="color:#1e3c72"],
+body.dark .container [style*="color: #1565c0"],
+body.dark .container [style*="color:#1565c0"],
+body.dark .container [style*="color: #2a5298"],
+body.dark .container [style*="color:#2a5298"] {
+  color: var(--color-foreground) !important;
+}
+
+body.dark .container [style*="color: #666"],
+body.dark .container [style*="color:#666"] {
+  color: var(--color-muted-foreground) !important;
+}
+
+/* Light mode keeps marine blue brand on headings */
+.container h1,
+.container h2,
+.container h3,
+.container h4 {
+  font-family: var(--font-body);
+  color: var(--color-foreground);
+}
+
+/* =========================================================================
+   ANALYSIS PANEL, STAT CARDS, GRADE GROUPS - dark mode coverage
+   The legacy styles.css gave these panels and cards hardcoded light
+   backgrounds (#f8f9fa, white) and dark-blue text. In dark mode they stayed
+   light and clashed badly with the dark navy page. Heading text rendered as
+   gold-on-tan. The next block normalizes every container in light mode and
+   inverts them for dark mode.
+   ========================================================================= */
+
+.container .analysis-panel,
+.container .grade-groups-panel {
+  background: var(--color-surface-2) !important;
+  background-image: none !important;
+  color: var(--color-foreground) !important;
+  border-left: 4px solid var(--color-usmc-scarlet) !important;
+  border-radius: var(--radius-md) !important;
+  padding: var(--space-4) !important;
+  margin: var(--space-4) 0 !important;
+}
+
+body.dark .container .analysis-panel,
+body.dark .container .grade-groups-panel {
+  background: var(--color-surface-2) !important;
+  color: var(--color-foreground) !important;
+  border-left-color: var(--color-usmc-scarlet) !important;
+}
+
+/* Headings inside these panels */
+.container .analysis-panel h3,
+.container .grade-groups-panel h3 {
+  color: var(--color-foreground) !important;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: var(--text-lg);
+  margin-bottom: var(--space-3);
+}
+
+/* Stat boxes (2.71 / 2 / 1 / 14) */
+.container .stat-box {
+  background: var(--color-card) !important;
+  color: var(--color-foreground) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-sm) !important;
+  padding: var(--space-4) !important;
+  text-align: center;
+}
+
+body.dark .container .stat-box {
+  background: var(--color-card) !important;
+  color: var(--color-foreground) !important;
+  border-color: var(--color-border) !important;
+}
+
+.container .stat-box .stat-value {
+  color: var(--color-usmc-scarlet) !important;
+  font-family: var(--font-display);
+  font-size: var(--text-4xl);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+body.dark .container .stat-box .stat-value {
+  color: var(--color-usmc-scarlet-300) !important;
+}
+
+.container .stat-box .stat-label {
+  color: var(--color-muted-foreground) !important;
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+
+body.dark .container .stat-box .stat-label {
+  color: var(--color-muted-foreground) !important;
+}
+
+/* Performance tier display - bias-neutral surface */
+.container .performance-tier-display,
+.container .tier-top,
+.container .tier-middle,
+.container .tier-developing {
+  background: var(--color-surface-3) !important;
+  background-image: none !important;
+  color: var(--color-foreground) !important;
+  border: 1px solid var(--color-border-strong) !important;
+  border-radius: var(--radius-chip) !important;
+  padding: 6px 16px !important;
+  font-weight: 600;
+}
+
+body.dark .container .performance-tier-display,
+body.dark .container .tier-top,
+body.dark .container .tier-middle,
+body.dark .container .tier-developing {
+  background: var(--color-surface-3) !important;
+  color: var(--color-foreground) !important;
+  border-color: var(--color-border-strong) !important;
+}
+
+/* Grade group cards (F/G Grades, D/E Grades, B/C Grades) */
+.container .grade-group {
+  background: var(--color-card) !important;
+  color: var(--color-foreground) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-sm) !important;
+  overflow: hidden;
+}
+
+body.dark .container .grade-group {
+  background: var(--color-card) !important;
+  color: var(--color-foreground) !important;
+  border-color: var(--color-border) !important;
+}
+
+.container .grade-group-header {
+  background: var(--color-surface-2) !important;
+  background-image: none !important;
+  color: var(--color-foreground) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+  padding: var(--space-3) !important;
+}
+
+body.dark .container .grade-group-header {
+  background: var(--color-surface-3) !important;
+  color: var(--color-foreground) !important;
+  border-bottom-color: var(--color-border) !important;
+}
+
+.container .grade-group-title {
+  color: var(--color-foreground) !important;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: var(--text-md);
+}
+
+.container .grade-group-subtitle {
+  color: var(--color-muted-foreground) !important;
+  opacity: 1 !important;
+  font-size: var(--text-xs);
+  margin-top: 4px;
+}
+
+/* Trait names inside grade groups */
+.container .grade-group .trait-name,
+.container .trait-name {
+  color: var(--color-foreground) !important;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+}
+
+body.dark .container .trait-name {
+  color: var(--color-foreground) !important;
+}
+
+.container .no-grades-message {
+  color: var(--color-subtle-foreground) !important;
+  font-style: italic;
+}
+
+/* Grade badges (letter circles) - keep brand-tinted but token-driven */
+.container .grade-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-weight: bold;
+  font-size: 14px;
+  color: var(--color-primary-foreground) !important;
+  flex-shrink: 0;
+  background: var(--color-marine-blue) !important;
+  background-image: none !important;
+}
+
+body.dark .container .grade-badge {
+  background: var(--color-marine-blue-300) !important;
+  color: var(--color-foreground) !important;
+}
+
+/* Validation panel inside Section I */
+.container .validation-panel {
+  background: var(--color-surface-2) !important;
+  color: var(--color-foreground) !important;
+  border: 1px solid var(--color-border) !important;
+  border-left: 4px solid var(--color-status-info) !important;
+  border-radius: var(--radius-md) !important;
+  padding: var(--space-3) var(--space-4) !important;
+}
+
+body.dark .container .validation-panel {
+  background: var(--color-surface-2) !important;
+  color: var(--color-foreground) !important;
+}
+
+.container .validation-panel h3,
+.container .validation-panel h4 {
+  color: var(--color-foreground) !important;
+}
+
+/* Validation message body text */
+.container .validation-message,
+.container .validation-text,
+.container .validation-panel p,
+.container .validation-panel div {
+  color: var(--color-foreground);
+}
+
+/* Word count display */
+.container .word-count-display,
+.container .word-count {
+  color: var(--color-muted-foreground) !important;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+body.dark .container .word-count-display,
+body.dark .container .word-count {
+  color: var(--color-muted-foreground) !important;
+}
+
+/* Section I textarea - dark mode */
+.container #sectionITextarea,
+.container .section-i-textarea {
+  background: var(--color-surface) !important;
+  color: var(--color-foreground) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--radius-md) !important;
+  padding: var(--space-3) !important;
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  line-height: 1.5;
+  min-height: 140px;
+  resize: vertical;
+  width: 100%;
+  transition: border-color var(--motion-fast) var(--easing-out),
+              box-shadow var(--motion-fast) var(--easing-out);
+}
+
+.container #sectionITextarea:focus,
+.container .section-i-textarea:focus {
+  outline: none;
+  border-color: var(--color-usmc-scarlet) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-usmc-scarlet) 18%, transparent) !important;
+}
+
+body.dark .container #sectionITextarea,
+body.dark .container .section-i-textarea {
+  background: var(--color-surface) !important;
+  color: var(--color-foreground) !important;
+  border-color: var(--color-border) !important;
+}
+
+/* =========================================================================
+   PRINT STYLESHEET OVERRIDE - Single-Page Document Layout
+   Hard reset of every legacy print rule. Output is a clean text document,
+   not a screenshot of the app. All three result sections on one page when
+   possible. Order: FITREP Marking Summary, Section I Comment, Directed
+   Comments. No forced page breaks. Page-break-inside: avoid on each section
+   so the section either fits on the current page or starts the next page.
+   ========================================================================= */
+
+@media print {
+  @page {
+    size: letter;
+    margin: 0.5in 0.6in 0.7in 0.6in;
+    @top-center {
+      content: "USMC FITREP EVALUATION";
+      font-family: "Times New Roman", serif;
+      font-size: 9pt;
+      letter-spacing: 0.05em;
+    }
+    @bottom-right {
+      content: "Page " counter(page) " of " counter(pages);
+      font-size: 8pt;
+      color: #666;
+    }
+  }
+
+  /* Hard reset of every page-break and animation property from styles.css.
+     Uses high-specificity body .container * selector to beat the legacy
+     .summary-card * { page-break-inside: avoid !important } rule. */
+  *, *::before, *::after,
+  body *, body *::before, body *::after,
+  body .container *,
+  body .container *::before,
+  body .container *::after {
+    page-break-before: auto !important;
+    page-break-after: auto !important;
+    page-break-inside: auto !important;
+    break-before: auto !important;
+    break-after: auto !important;
+    break-inside: auto !important;
+    animation: none !important;
+    transition: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  /* Then re-enable page-break-inside: avoid ONLY on the two result cards
+     to keep each section together if possible. */
+  body .container #summaryCard,
+  body .container #sectionIGenerationCard {
+    page-break-inside: avoid !important;
+  }
+
+  /* Document body. Force light. Force serif typography. Force no min-height. */
+  html, body, body.dark, .dark {
+    background: white !important;
+    background-image: none !important;
+    color: black !important;
+    font-family: "Times New Roman", Georgia, serif !important;
+    font-size: 10pt !important;
+    line-height: 1.4 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Hide all chrome, modals, banners, footers, tooltips, and non-result UI.
+     #directedCommentsCard is hidden because its content is already inline
+     in the Section I generated comment. Printing it separately is redundant. */
+  #stickyChrome,
+  .sticky-chrome,
+  .poc-banner,
+  .poc-modal-overlay,
+  .poc-footer,
+  footer.disclaimer-footer,
+  #helpButton,
+  .help-button,
+  .help-modal,
+  .justification-modal,
+  .reevaluate-modal,
+  .save-profile-modal,
+  #disclaimer-modal,
+  .sa-modal,
+  .sa-modal-backdrop,
+  #tooltip,
+  .tooltip-content,
+  #gridTooltip,
+  .breadcrumbs,
+  .progress-section,
+  .header-nav,
+  .button-row,
+  .export-section,
+  button,
+  .btn,
+  #evaluationContainer,
+  #howItWorksCard,
+  #modeSelectionCard,
+  #profileLoginCard,
+  #profileDashboardCard,
+  #setupCard,
+  #reviewCard,
+  #directedCommentsCard,
+  .directed-comments-card,
+  .warning-banner,
+  .data-warning,
+  #dataWarning,
+  .generation-options,
+  .validation-panel,
+  .analysis-panel,
+  .grade-groups-panel,
+  .directed-comments-grid,
+  .word-count-display,
+  .word-count,
+  .performance-tier-display,
+  /* Hide the "Generated Section I Comment" sub-header and its intro paragraph */
+  #sectionIGenerationCard > div > h3,
+  #sectionIGenerationCard > div > p,
+  #sectionIGenerationCard > p,
+  /* The first h3 inside Section I describes "Evaluation Analysis" - skip */
+  .analysis-stats {
+    display: none !important;
+  }
+
+  /* Container becomes a flowing document */
+  body .container {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    max-width: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: white !important;
+    min-height: 0 !important;
+    height: auto !important;
+  }
+
+  /* Two-page layout:
+     Page 1 = FITREP Summary attributes (marking grid)
+     Page break
+     Page 2 = Section I generated comment (text only, no title)            */
+  body .container #summaryCard,
+  body .container #sectionIGenerationCard {
+    display: block !important;
+    visibility: visible !important;
+    background: white !important;
+    color: black !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  /* Hide Summary card when it has no rendered evaluation data. */
+  body .container #summaryCard:has(#summaryGrid:empty),
+  body .container #summaryCard:not(:has(#summaryGrid > *)) {
+    display: none !important;
+  }
+
+  /* Hide Section I card when its textarea is empty. */
+  body .container #sectionIGenerationCard:has(#sectionITextarea:placeholder-shown) {
+    display: none !important;
+  }
+
+  /* Order: Summary first, Section I second. */
+  body .container #summaryCard {
+    order: 1 !important;
+    page-break-after: always !important;
+  }
+
+  /* Section I is FORCED to start on page 2. */
+  body .container #sectionIGenerationCard {
+    order: 2 !important;
+    page-break-before: always !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    border-top: none !important;
+  }
+
+  /* Hide the "Section I Comment Generation" h2 and any sub-headings inside
+     the Section I card. User requested removing the title and any
+     "Comments:" or "Directed Comment:" labels from print. */
+  body .container #sectionIGenerationCard h2,
+  body .container #sectionIGenerationCard h3,
+  body .container #sectionIGenerationCard h4,
+  body .container #sectionIGenerationCard .comment-form-title,
+  body .container #sectionIGenerationCard label {
+    display: none !important;
+  }
+
+  /* Hide the inline Section I and Directed Comments items that the JS
+     appends to the Summary grid. Their content is duplicated on page 2
+     via the #sectionIGenerationCard textarea, and the directed-comments
+     card is already hidden. */
+  body .container #summaryCard .summary-item--section-i,
+  body .container #summaryCard .summary-item--directed,
+  body .container #summaryCard [data-print-role="section-i-inline"],
+  body .container #summaryCard [data-print-role="directed-inline"] {
+    display: none !important;
+  }
+
+  /* Section main headers (h2) - centered, all-caps, bold, with underline */
+  body .container h2 {
+    font-family: "Times New Roman", serif !important;
+    font-size: 13pt !important;
+    font-weight: bold !important;
+    color: black !important;
+    text-align: center !important;
+    margin: 0 0 6pt 0 !important;
+    padding: 0 0 3pt 0 !important;
+    border-bottom: 1.25pt solid black !important;
+    text-transform: uppercase !important;
+    background: none !important;
+    letter-spacing: 0.05em !important;
+  }
+
+  body .container h3, body .container h4 {
+    font-family: "Times New Roman", serif !important;
+    font-size: 10.5pt !important;
+    font-weight: bold !important;
+    color: black !important;
+    margin: 4pt 0 2pt 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    background: none !important;
+    text-align: left !important;
+    text-transform: none !important;
+  }
+
+  /* FITREP Average - prominent boxed score */
+  body .container .fitrep-average {
+    background: #f4f4f4 !important;
+    color: black !important;
+    font-family: "Times New Roman", serif !important;
+    font-size: 18pt !important;
+    font-weight: bold !important;
+    padding: 4pt 14pt !important;
+    margin: 4pt auto 6pt auto !important;
+    text-align: center !important;
+    border: 1pt solid black !important;
+    display: block !important;
+    width: fit-content !important;
+    border-radius: 0 !important;
+  }
+
+  /* Evaluation meta line (marine info) */
+  body .container #evaluationMeta {
+    font-family: "Times New Roman", serif !important;
+    font-size: 9pt !important;
+    margin: 2pt 0 6pt 0 !important;
+    padding: 0 0 4pt 0 !important;
+    text-align: center !important;
+    color: black !important;
+    background: none !important;
+    border-bottom: 0.5pt solid #ccc !important;
+  }
+
+  /* Summary grid - tight 2-column trait list */
+  body .container .summary-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 2pt 10pt !important;
+    margin: 4pt 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  /* Summary items - flat list, no card chrome */
+  body .container .summary-item,
+  body .container .summary-trait-card {
+    background: white !important;
+    color: black !important;
+    border: none !important;
+    border-bottom: 0.5pt solid #ddd !important;
+    border-left: none !important;
+    border-radius: 0 !important;
+    padding: 2pt 0 !important;
+    margin: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    page-break-inside: avoid !important;
+  }
+
+  body .container .summary-trait {
+    font-family: "Times New Roman", serif !important;
+    font-size: 9pt !important;
+    font-weight: bold !important;
+    margin: 0 !important;
+    line-height: 1.3 !important;
+    color: black !important;
+    display: inline !important;
+  }
+
+  body .container .summary-grade {
+    font-family: "Times New Roman", serif !important;
+    font-size: 10pt !important;
+    font-weight: bold !important;
+    margin: 0 0 0 4pt !important;
+    line-height: 1.3 !important;
+    color: black !important;
+    display: inline !important;
+  }
+
+  body .container .summary-grade::before {
+    content: " \2014 ";
+    color: black;
+    font-weight: normal;
+  }
+
+  body .container .summary-justification {
+    font-family: "Times New Roman", serif !important;
+    font-size: 8.5pt !important;
+    line-height: 1.4 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    margin: 1pt 0 0 0 !important;
+    color: #333 !important;
+    font-style: italic !important;
+    display: block !important;
+    -webkit-line-clamp: unset !important;
+    line-clamp: unset !important;
+    -webkit-box-orient: unset !important;
+  }
+
+  /* Section I textarea content - render its value as a clean paragraph block */
+  body .container #sectionITextarea {
+    display: block !important;
+    width: 100% !important;
+    min-height: 0 !important;
+    height: auto !important;
+    border: none !important;
+    background: white !important;
+    color: black !important;
+    padding: 0 !important;
+    margin: 4pt 0 0 0 !important;
+    font-family: "Times New Roman", serif !important;
+    font-size: 10pt !important;
+    line-height: 1.5 !important;
+    resize: none !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+    text-align: justify !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    field-sizing: content;
+  }
+
+  /* Selected directed comments - format as a tight item list */
+  body .container .selected-comments-section {
+    display: block !important;
+    visibility: visible !important;
+    background: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 4pt 0 0 0 !important;
+  }
+
+  body .container .selected-comment-item,
+  body .container .directed-comment-card.selected {
+    border: none !important;
+    border-bottom: 0.5pt solid #ddd !important;
+    border-left: none !important;
+    padding: 3pt 0 !important;
+    margin: 0 !important;
+    background: white !important;
+    color: black !important;
+    page-break-inside: avoid !important;
+    border-radius: 0 !important;
+  }
+
+  body .container .selected-comment-title,
+  body .container .selected-comment-item h4,
+  body .container .selected-comment-item h5,
+  body .container .selected-comment-item strong {
+    font-family: "Times New Roman", serif !important;
+    font-size: 10pt !important;
+    font-weight: bold !important;
+    color: black !important;
+    margin: 0 !important;
+    display: inline !important;
+  }
+
+  body .container .selected-comment-title::after,
+  body .container .selected-comment-item strong::after {
+    content: ": ";
+    font-weight: normal;
+  }
+
+  body .container .selected-comment-text,
+  body .container .selected-comment-item p,
+  body .container .selected-comment-item .filled-text {
+    font-family: "Times New Roman", serif !important;
+    font-size: 9.5pt !important;
+    line-height: 1.4 !important;
+    color: black !important;
+    margin: 0 !important;
+    display: inline !important;
+  }
+
+  /* Final force: any decorative backgrounds removed */
+  body .container * {
+    background-color: transparent !important;
+    background-image: none !important;
+  }
+
+  /* Keep only the intentional backgrounds */
+  body .container .fitrep-average {
+    background: #f4f4f4 !important;
+  }
+}

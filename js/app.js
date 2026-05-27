@@ -1,0 +1,292 @@
+// Main Application Logic & Event Handlers
+
+// Initialize application when DOM is loaded
+// DOMContentLoaded initialization
+document.addEventListener('DOMContentLoaded', () => {
+    // Centralized UI constants with safe fallbacks
+    const baseUI = (window.CONSTANTS && window.CONSTANTS.UI_SETTINGS)
+        ? window.CONSTANTS.UI_SETTINGS
+        : { DISPLAY: { BLOCK: 'block', NONE: 'none', FLEX: 'flex', INLINE_BLOCK: 'inline-block' }, CSS: { ACTIVE: 'active' } };
+    const UI = { DISPLAY: Object.assign({}, baseUI.DISPLAY, { SHOW: baseUI.DISPLAY.BLOCK, HIDE: baseUI.DISPLAY.NONE }), CSS: baseUI.CSS };
+    // PoC: voice module deleted under Phase 1. initializeVoiceRecognition no-op stub.
+
+    // Open the disclaimer modal on application load
+    if (window.modalController) {
+        window.modalController.openById('disclaimer-modal');
+    }
+
+    // Initialize persistence and enhanced auto-save
+    try { if (typeof initializePersistence === 'function') initializePersistence(); } catch (_) {}
+
+    const mode = document.getElementById('modeSelectionCard');
+    const setup = document.getElementById('setupCard');
+    // PoC: profileLoginCard and profileDashboardCard DOM elements removed.
+
+    // Initial view state management
+    if (mode) { mode.classList.add(UI.CSS.ACTIVE); mode.style.display = UI.DISPLAY.SHOW; }
+    if (setup) { setup.classList.remove(UI.CSS.ACTIVE); setup.style.display = UI.DISPLAY.HIDE; }
+
+    // PoC: dashboard auto-load on session removed. No login_source sessionStorage.
+    // Mode Selection is always the default boot screen.
+
+    // Set default dates
+    const today = new Date();
+    const oneYearAgo = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
+    document.getElementById('fromDateInput').value = oneYearAgo.toISOString().split('T')[0];
+    document.getElementById('toDateInput').value = today.toISOString().split('T')[0];
+
+    // Word count tracking and modal handlers using lifecycle manager
+    const addListener = (target, event, handler, options) => {
+        if (typeof globalLifecycle !== 'undefined') {
+            globalLifecycle.addEventListener(target, event, handler, options);
+        } else {
+            target.addEventListener(event, handler, options);
+        }
+    };
+
+    addListener(document, 'input', function(e) {
+        if (e.target.id === 'justificationText') {
+            updateWordCount();
+        } else if (e.target.id === 'sectionITextarea') {
+            updateSectionIWordCount();
+        }
+    });
+
+    // Close modal when clicking outside
+    const justificationModal = document.getElementById('justificationModal');
+    if (justificationModal) {
+        addListener(justificationModal, 'click', function(e) {
+            if (e.target === this) {
+                cancelJustification();
+            }
+        });
+    }
+
+    const helpModal = document.getElementById('helpModal');
+    if (helpModal) {
+        addListener(helpModal, 'click', function(e) {
+            if (e.target === this) {
+                closeHelpModal();
+            }
+        });
+    }
+
+    // Attach dynamic tooltips for grid headers with title attributes
+    try {
+        const attachGridTooltips = () => {
+            const headers = document.querySelectorAll('#profileGrid thead th[title]');
+            headers.forEach((th) => {
+                const text = th.getAttribute('title') || '';
+                if (!text) return;
+                th.addEventListener('mouseenter', (e) => showDynamicTooltip(e, text));
+                th.addEventListener('mouseleave', () => hideDynamicTooltip());
+                th.addEventListener('focus', (e) => showDynamicTooltip(e, text));
+                th.addEventListener('blur', () => hideDynamicTooltip());
+            });
+        };
+        attachGridTooltips();
+    } catch (_) {}
+
+    // Dev-only dispatch removed; production UI should not expose workflow controls here
+});
+
+// Add Single Evaluation entrypoint used by index.html button
+function startStandaloneMode() {
+    // PoC: no login_source sessionStorage. No profile context.
+    window.currentProfile = null;
+
+    const mode = document.getElementById('modeSelectionCard');
+    const UI = (window.CONSTANTS && window.CONSTANTS.UI_SETTINGS)
+        ? window.CONSTANTS.UI_SETTINGS
+        : { DISPLAY: { SHOW: 'block', HIDE: 'none' }, CSS: { ACTIVE: 'active' } };
+    // profileLoginCard and profileDashboardCard removed under Phase 1.
+    [mode].forEach(el => {
+        if (el) { el.classList.remove(UI.CSS.ACTIVE); el.style.display = UI.DISPLAY.HIDE; }
+    });
+
+    const setup = document.getElementById('setupCard');
+    if (setup) { setup.classList.add(UI.CSS.ACTIVE); setup.style.display = UI.DISPLAY.SHOW; }
+
+    // Ensure RS display/input reflect standalone mode (no profile)
+    try { if (typeof updateRSSetupDisplay === 'function') updateRSSetupDisplay(); } catch (_) {}
+
+    // Align navigation state if available
+    try {
+        if (typeof jumpToStep === 'function' && typeof STEPS !== 'undefined') {
+            jumpToStep(STEPS.setup);
+        }
+    } catch (_) {}
+
+    window.scrollTo({ top: 0, behavior: 'auto' });
+}
+
+// PoC: showRSLoginFirst stub. Login UI removed entirely. Any caller is a stale
+// reference. Function returns without effect.
+function showRSLoginFirst() {
+    console.warn('[poc] showRSLoginFirst invoked but login UI is removed. No-op.');
+}
+
+// --- Global Tooltip Helpers ---
+let __tooltipHideTimer = null;
+
+function showTooltip(event, tooltipId) {
+    try {
+        const tip = document.getElementById(tooltipId);
+        if (!tip) return;
+        // Position near the triggering element
+        const target = event.currentTarget || event.target;
+        const rect = target.getBoundingClientRect();
+        // Using fixed positioning; viewport-relative coords
+        const top = rect.bottom + 8;
+        const left = rect.left;
+        tip.classList.remove('tooltip-centered');
+        tip.style.top = `${top}px`;
+        tip.style.left = `${left}px`;
+        const UI = (window.CONSTANTS && window.CONSTANTS.UI_SETTINGS)
+            ? window.CONSTANTS.UI_SETTINGS
+            : { DISPLAY: { SHOW: 'block', HIDE: 'none' }, CSS: { ACTIVE: 'active' } };
+        if (tip.parentNode !== document.body) {
+            document.body.appendChild(tip);
+        }
+        tip.style.zIndex = '100000';
+        tip.classList.add('active');
+        tip.style.display = UI.DISPLAY.SHOW;
+
+        if (event && event.type === 'click') {
+            tip.classList.add('tooltip-centered');
+        }
+
+        // Clear previous timer and set a new auto-hide
+        if (__tooltipHideTimer) clearTimeout(__tooltipHideTimer);
+        __tooltipHideTimer = setTimeout(() => hideTooltip(tooltipId), 5000);
+
+        // Hide when clicking anywhere else
+        const dismiss = (e) => {
+            if (!tip.contains(e.target) && e.target !== target) {
+                hideTooltip(tooltipId);
+                document.removeEventListener('click', dismiss);
+            }
+        };
+        document.addEventListener('click', dismiss);
+    } catch (err) {
+        console.warn('showTooltip error:', err);
+    }
+}
+
+function hideTooltip(tooltipId) {
+    const tip = document.getElementById(tooltipId);
+    const UI = (window.CONSTANTS && window.CONSTANTS.UI_SETTINGS)
+        ? window.CONSTANTS.UI_SETTINGS
+        : { DISPLAY: { SHOW: 'block', HIDE: 'none' }, CSS: { ACTIVE: 'active' } };
+    if (tip) {
+        tip.classList.remove('active');
+        tip.classList.remove('tooltip-centered');
+        tip.style.display = UI.DISPLAY.HIDE;
+    }
+    if (__tooltipHideTimer) {
+        clearTimeout(__tooltipHideTimer);
+        __tooltipHideTimer = null;
+    }
+}
+
+// Dynamic tooltip utilities for elements with inline title text
+function showDynamicTooltip(event, text) {
+    try {
+        let tip = document.getElementById('gridTooltip');
+        if (!tip) {
+            tip = document.createElement('div');
+            tip.id = 'gridTooltip';
+            tip.className = 'tooltip-content';
+            document.body.appendChild(tip);
+        }
+        tip.textContent = text;
+        const target = event.currentTarget || event.target;
+        const rect = target.getBoundingClientRect();
+        const top = rect.bottom + 8;
+        const left = Math.max(8, Math.min(rect.left, window.innerWidth - 320));
+        tip.style.top = `${top}px`;
+        tip.style.left = `${left}px`;
+        tip.style.zIndex = '100000';
+        tip.classList.add('active');
+        tip.style.display = 'block';
+        if (__tooltipHideTimer) clearTimeout(__tooltipHideTimer);
+        __tooltipHideTimer = setTimeout(() => hideDynamicTooltip(), 5000);
+    } catch (_) {}
+}
+
+function hideDynamicTooltip() {
+    try {
+        const tip = document.getElementById('gridTooltip');
+        if (tip) {
+            tip.classList.remove('active');
+            tip.style.display = 'none';
+        }
+        if (__tooltipHideTimer) {
+            clearTimeout(__tooltipHideTimer);
+            __tooltipHideTimer = null;
+        }
+    } catch (_) {}
+}
+
+// PoC: showProfileLogin stub. Login UI removed.
+function showProfileLogin() {
+    console.warn('[poc] showProfileLogin invoked but login UI is removed. No-op.');
+}
+
+// --- Theme Toggle ---
+// PoC: theme preference cannot persist to localStorage under the charter.
+// Theme state lives in a module-level variable. Reload resets to light.
+let __pocThemeIsDark = false;
+
+/**
+ * Toggle between light and dark mode for the current session only.
+ * Uses the `dark` class to match the Semper token system selectors.
+ */
+function toggleTheme() {
+    const body = document.body;
+    __pocThemeIsDark = body.classList.toggle('dark');
+    updateThemeToggleButton(__pocThemeIsDark);
+}
+
+/**
+ * Update the theme toggle button appearance
+ * @param {boolean} isDark - Whether dark mode is active
+ */
+function updateThemeToggleButton(isDark) {
+    const toggle = document.getElementById('themeToggle');
+    if (!toggle) return;
+
+    // PoC: icon swap is handled in poc-header.css via the .dark class on body.
+    // The moon and sun SVGs are both in the DOM; CSS shows the correct one.
+    // We only update the text label and aria-label here.
+    const label = toggle.querySelector('.theme-label');
+
+    if (label) label.textContent = isDark ? 'Light' : 'Dark';
+    try {
+        toggle.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+    } catch (_) {}
+}
+
+/**
+ * Initialize theme. PoC: always starts in light mode. No persistence.
+ */
+function initializeTheme() {
+    __pocThemeIsDark = false;
+    updateThemeToggleButton(false);
+}
+
+try {
+    if (typeof window !== 'undefined') {
+        window.toggleTheme = toggleTheme;
+        window.initializeTheme = initializeTheme;
+    }
+} catch (_) {}
+
+try {
+    const apply = () => { try { initializeTheme(); } catch (_) {} };
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', apply);
+    } else {
+        apply();
+    }
+} catch (_) {}

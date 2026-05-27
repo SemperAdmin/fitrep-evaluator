@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>FITREP Evaluator - PoC - Methodology Aid Only</title>
+    <!-- Semper Admin token system loads first so all downstream styles inherit the variables. -->
+    <link rel="stylesheet" href="css/semper-tokens.css">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/performance.css">
+    <!-- PoC header CSS loads after styles.css so token-driven header rules override legacy header CSS. -->
+    <link rel="stylesheet" href="css/poc-header.css">
+    <!-- PoC app polish layer: token-driven overrides for cards, modals, inputs, buttons, animations, accessibility. -->
+    <link rel="stylesheet" href="css/poc-app.css">
+    <!-- PoC banner loads LAST so its raw warning treatment cascade-wins over brand tokens. Deliberate visual distinction. -->
+    <link rel="stylesheet" href="css/poc-banner.css">
+    <!-- Explicit favicon to avoid default /favicon.ico 404 -->
+    <link rel="icon" type="image/png" href="assets/images/Logo.png">
+    <link rel="shortcut icon" href="assets/images/Logo.png">
+    <!-- PoC config loads first to install network and storage guards -->
+    <script src="js/config.js"></script>
+    <!-- PoC banner script gates user interaction behind a forced acknowledgment -->
+    <script src="js/pocBanner.js"></script>
+    <!-- Synthetic data fixture is the only acceptable input source -->
+    <script src="js/syntheticFixture.js"></script>
+</head>
+<body>
+    <!-- Sticky chrome wraps PoC banner (injected by pocBanner.js) and the app header. -->
+    <div id="stickyChrome" class="sticky-chrome">
+        <div class="header">
+            <!-- Branding row -->
+            <div class="header-branding">
+                <img src="assets/images/Logo.png" alt="Semper Admin Logo" class="header-logo" width="160" height="40" loading="eager" decoding="async" fetchpriority="high" onerror="this.style.display='none'">
+                <div class="header-titles">
+                    <h1>USMC FITNESS REPORT EVALUATOR</h1>
+                    <div class="header-subtitle-row">
+                        <p class="header-subtitle">Unbiased FITREP marking assistance tool</p>
+                        <span class="header-credit">by Semper Admin</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info row -->
+            <div class="header-info">
+                <button type="button" class="header-link header-link--button" id="helpButton" onclick="openHelpModal()" title="How this tool works" aria-label="Open Help: How This Tool Works" aria-controls="helpModal" aria-expanded="false">
+                    <svg class="link-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                    <span>How It Works</span>
+                </button>
+                <span class="header-divider" aria-hidden="true">&middot;</span>
+                <a href="https://www.mcele.usmc.mil/mvs/watchVideo.aspx?Id=62633B22C893" target="_blank" rel="noopener" class="header-link" title="Watch the marking philosophy video on MCELE">
+                    <svg class="link-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                        <polygon points="6 4 20 12 6 20 6 4" fill="currentColor"></polygon>
+                    </svg>
+                    <span>Marking Philosophy Video</span>
+                </a>
+                <span class="header-divider" aria-hidden="true">&middot;</span>
+                <button type="button" class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Switch to dark mode">
+                    <svg class="theme-icon theme-icon--moon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="theme-icon theme-icon--sun" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                        <circle cx="12" cy="12" r="4"></circle>
+                        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+                    </svg>
+                    <span class="theme-label">Dark</span>
+                </button>
+            </div>
+
+            <!-- Navigation row - only shown during evaluation -->
+            <div class="header-nav" hidden>
+                <nav id="breadcrumbs" aria-label="Breadcrumb" class="breadcrumbs"></nav>
+            </div>
+
+            <!-- Progress section - only shown during evaluation -->
+            <div class="progress-section" hidden>
+                <div class="progress-details">
+                    <span id="progressText">Setup</span>
+                    <div class="auto-save-indicator managed saved" id="autoSaveIndicator" aria-live="polite">
+                        <span class="icon" aria-hidden="true"></span>
+                        <span class="text">Saved</span>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+
+        
+
+        <!-- Setup Card: start hidden (no 'active') -->
+        <!-- Setup Card: add Occasion Type -->
+        <div class="setup-card" id="setupCard" style="position: relative;">
+            <!-- PoC: RS Dashboard removed under Phase 1 charter compliance. -->
+            <div class="setup-title">Evaluation Setup</div>
+            
+            <div class="form-group">
+                <label class="form-label" for="marineNameInput">Synthetic Persona Identifier:</label>
+                <input type="text" class="form-input" id="marineNameInput" placeholder="MARINE_ALPHA_01 (synthetic only - no real names)" pattern="MARINE_[A-Z]+_\d{2}" required aria-required="true" autocomplete="off" spellcheck="false" title="Use synthetic identifiers only. Format: MARINE_ALPHA_01 through MARINE_ZULU_99.">
+                <p style="font-size: 12px; color: #b71c1c; margin: 6px 0 0 0;"><strong>PoC constraint:</strong> Do not enter real Marine names. Use only synthetic identifiers from the fixture.</p>
+            </div>
+            
+            <!-- New: Marine Rank dropdown -->
+            <div class="form-group">
+                <label class="form-label" for="marineRankSelect">Marine Rank:</label>
+                <select class="setup-select" id="marineRankSelect" required aria-required="true">
+                    <option value="">Select Rank...</option>
+                    <option value="Sgt">Sgt</option>
+                    <option value="SSgt">SSgt</option>
+                    <option value="GySgt">GySgt</option>
+                    <option value="MSgt">MSgt</option>
+                    <option value="1stSgt">1stSgt</option>
+                    <option value="MGySgt">MGySgt</option>
+                    <option value="SgtMaj">SgtMaj</option>
+                    <option value="WO">WO</option>
+                    <option value="CWO2">CWO2</option>
+                    <option value="CWO3">CWO3</option>
+                    <option value="CWO4">CWO4</option>
+                    <option value="CWO5">CWO5</option>
+                    <option value="2ndLt">2ndLt</option>
+                    <option value="1stLt">1stLt</option>
+                    <option value="Capt">Capt</option>
+                    <option value="Maj">Maj</option>
+                    <option value="LtCol">LtCol</option>
+                    <option value="Col">Col</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Evaluation Period:</label>
+                <div class="date-inputs">
+                    <input type="date" class="form-input" id="fromDateInput" required aria-required="true">
+                    <input type="date" class="form-input" id="toDateInput" required aria-required="true">
+                </div>
+            </div>
+
+            <!-- Occasion Type Selection -->
+            <div class="form-group">
+                <label class="form-label">
+                    Occasion Type:
+                    <button type="button" class="info-icon" onclick="showTooltip(event, 'occasion-setup-tooltip')" onmouseenter="showTooltip(event, 'occasion-setup-tooltip')" onmouseleave="hideTooltip('occasion-setup-tooltip')" onfocus="showTooltip(event, 'occasion-setup-tooltip')" onblur="hideTooltip('occasion-setup-tooltip')" title="What does Occasion mean?" aria-label="Show occasion info"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></button>
+                </label>
+                <select class="setup-select" id="evaluationOccasionSetup" required aria-required="true">
+                    <option value="">Select Occasion Type...</option>
+                    <option value="GC">Grade Change - GC</option>
+                    <option value="DC">CMC Directed - DC</option>
+                    <option value="CH">Change of Reporting Senior - CH</option>
+                    <option value="TR">Transfer - TR</option>
+                    <option value="CD">Change of Duty - CD</option>
+                    <option value="TD">To Temporary Duty - TD</option>
+                    <option value="FD">From Temporary Duty - FD</option>
+                    <option value="EN">End of Service - EN</option>
+                    <option value="CS">Change in Status - CS</option>
+                    <option value="AN">Annual (Active Component) - AN</option>
+                    <option value="AR">Annual (Reserve Component) - AR</option>
+                    <option value="SA">Semiannual (Lieutenants only) - SA</option>
+                    <option value="RT">Reserve Training - RT</option>
+                </select>
+                <div class="tooltip-content" id="occasion-setup-tooltip">
+                    <strong>Evaluation Occasion Types per MCO 1610.7B:</strong><br><br>
+                    <strong>Grade Change (GC):</strong> When Marine is promoted<br>
+                    <strong>CMC Directed (DC):</strong> Special evaluations ordered by CMC<br>
+                    <strong>Change of RS (CH):</strong> When Reporting Senior changes<br>
+                    <strong>Transfer (TR):</strong> Marine changes duty station<br>
+                    <strong>Change of Duty (CD):</strong> New assignment, same unit<br>
+                    <strong>To/From Temp Duty (TD/FD):</strong> Temporary assignments<br>
+                    <strong>End of Service (EN):</strong> Retirement, separation, or EAS<br>
+                    <strong>Change in Status (CS):</strong> Active ↔ Reserve changes<br>
+                    <strong>Annual (AN/AR):</strong> Regular yearly evaluation<br>
+                    <strong>Semiannual (SA):</strong> Lieutenants only, twice yearly<br>
+                    <strong>Reserve Training (RT):</strong> Annual training evaluation
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="reportingSeniorSelect">Is the person being evaluated a Reporting Senior?</label>
+                <select class="setup-select" id="reportingSeniorSelect" required aria-required="true">
+                    <option value="">Select...</option>
+                    <option value="yes">Yes - Include Section H (Evaluation Responsibilities)</option>
+                    <option value="no">No - Standard Evaluation (Sections D-G only)</option>
+                </select>
+            </div>
+            
+            <div class="form-group" id="rsInfoGroup">
+                <label class="form-label" for="evaluatorNameInput">Reporting Senior Synthetic Identifier:</label>
+                <!-- PoC: RS Dashboard button removed under Phase 1 charter compliance. -->
+                <div class="rs-inline" style="display: flex; align-items: center; gap: 10px;">
+                    <input type="text" class="form-input" id="evaluatorCombinedInput"
+                           placeholder="RS_ALPHA_01 (synthetic only)" aria-label="Reporting Senior Synthetic Identifier"
+                           pattern="RS_[A-Z]+_\d{2}" tabindex="0" style="flex: 1;">
+                    <!-- Hidden originals kept for compatibility -->
+                    <select class="setup-select" id="evaluatorRankSelect" aria-label="Reporting Senior Rank" 
+                            style="display:none" aria-hidden="true">
+                        <option value="">Rank...</option>
+                        <option value="Sgt">Sgt</option>
+                        <option value="SSgt">SSgt</option>
+                        <option value="GySgt">GySgt</option>
+                        <option value="MSgt">MSgt</option>
+                        <option value="1stSgt">1stSgt</option>
+                        <option value="MGySgt">MGySgt</option>
+                        <option value="SgtMaj">SgtMaj</option>
+                        <option value="WO">WO</option>
+                        <option value="CWO2">CWO2</option>
+                        <option value="CWO3">CWO3</option>
+                        <option value="CWO4">CWO4</option>
+                        <option value="CWO5">CWO5</option>
+                        <option value="2ndLt">2ndLt</option>
+                        <option value="1stLt">1stLt</option>
+                        <option value="Capt">Capt</option>
+                        <option value="Maj">Maj</option>
+                        <option value="LtCol">LtCol</option>
+                        <option value="Col">Col</option>
+                    </select>
+                    <input type="text" class="form-input" id="evaluatorNameInput" 
+                           placeholder="Reporting Senior Name" required aria-required="true" 
+                           style="display:none" aria-hidden="true">
+                </div>
+                <div id="rsProfileDisplay" class="form-static" style="display: none;" aria-live="polite"></div>
+            </div>
+            
+            <button class="btn btn-meets" onclick="startEvaluation()" style="margin-top: 20px; width: 100%;">Begin Evaluation</button>
+        </div>
+
+        <!-- How This Works Card -->
+        <div class="setup-card" id="howItWorksCard" style="text-align: left;">
+            <div class="setup-title" style="text-align: center;">How This Tool Works</div>
+            
+            <div style="margin-bottom: 20px;">
+                <h3 class="info-card-title"><svg class="icon icon--md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Unbiased Evaluation Philosophy</h3>
+                <p style="line-height: 1.6; margin-bottom: 15px;">
+                    Traditional FITREP marking often suffers from <strong>grade inflation</strong> and <strong>preconceived notions</strong>. 
+                    Evaluators frequently decide on a final grade first, then justify it backward. This tool eliminates that bias.
+                </p>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h3 class="info-card-title"><svg class="icon icon--md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>Left-to-Right Methodology</h3>
+                <p style="line-height: 1.6; margin-bottom: 10px;">For each trait, you'll be presented with descriptive performance standards:</p>
+                <ul style="margin-left: 20px; line-height: 1.6;">
+                    <li><strong>Start at B:</strong> "Meets requirements, maintains status quo"</li>
+                    <li><strong>Move to D:</strong> "Consistently produces quality results, improves unit performance"</li>
+                    <li><strong>Move to F:</strong> "Results far surpass expectations, significant impact"</li>
+                </ul>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h3 class="info-card-title"><svg class="icon icon--md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Three-Choice Decision Making</h3>
+                <div class="decision-grid">
+                    <div class="decision-box decision-not-meet">
+                        <strong class="decision-title-not-meet">Does Not Meet</strong><br>
+                        <small>Select previous grade</small>
+                    </div>
+                    <div class="decision-box decision-meets">
+                        <strong class="decision-title-meets">Meets</strong><br>
+                        <small>Accept current standard</small>
+                    </div>
+                    <div class="decision-box decision-surpasses">
+                        <strong class="decision-title-surpasses">Surpasses</strong><br>
+                        <small>Move to next level</small>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h3 class="info-card-title"><svg class="icon icon--md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Required Justification</h3>
+                <p style="line-height: 1.6;">
+                    Every marking decision requires <strong>specific justification</strong> with examples and evidence. 
+                    This ensures accountability and provides valuable feedback to the Marine being evaluated.
+                </p>
+            </div>
+
+            <div class="result-box">
+                <h4 class="result-box-title"><svg class="icon icon--md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>Result: Objective, Defensible Evaluations</h4>
+                <p style="line-height: 1.6; margin: 0; font-size: 14px;">
+                    By evaluating performance against established standards rather than predetermined outcomes, 
+                    this tool produces more accurate, fair, and legally defensible FITREP markings that truly reflect Marine performance.
+                </p>
+            </div>
+        </div>
+
+        <!-- Evaluation Cards -->
+        <div id="evaluationContainer"></div>
+
+        <!-- Review Card - NEW -->
+        <div class="review-card" id="reviewCard">
+            <h2 style="text-align: center; color: #1e3c72; margin-bottom: 20px;">Review and Edit Evaluations</h2>
+            <p style="text-align: center; color: #666; margin-bottom: 30px;">
+                Review all trait evaluations below before proceeding to directed comments.
+            </p>
+            
+            <div class="review-grid" id="reviewGrid">
+                <!-- Review items will be populated by JavaScript -->
+            </div>
+            
+            <div class="review-actions">
+                <div class="button-row">
+                    <button class="btn btn-meets" onclick="proceedToDirectedComments()">Continue to Directed Comments</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section I Generation Card -->
+        <div class="section-i-generation-card" id="sectionIGenerationCard">
+            <h2 style="text-align: center; color: #1e3c72; margin-bottom: 20px;">Section I Comment Generation</h2>
+            <p style="text-align: center; color: #666; margin-bottom: 30px;">
+                Based on your trait evaluations and justifications, we'll generate a professional Section I comment for your review and editing.
+            </p>
+            
+            <div class="analysis-panel">
+                <h3 style="color: #1e3c72; margin-bottom: 15px;">Evaluation Analysis</h3>
+                <div class="analysis-stats" id="analysisStats"></div>
+                <div style="text-align: center;">
+                    <span>Performance Classification: </span>
+                    <span class="performance-tier-display" id="performanceTierDisplay">Analyzing...</span>
+                </div>
+            </div>
+            
+            <!-- Grade Groups Display -->
+            <div class="grade-groups-panel" id="gradeGroupsContainer">
+                <!-- Grade groups will be populated by JavaScript -->
+            </div>
+            
+            <!-- Validation Warnings -->
+            <div class="validation-panel" id="validationWarnings">
+                <!-- Validation results will be populated by JavaScript -->
+            </div>
+            
+            <div style="text-align: center; margin: 30px 0;">
+                <div class="generation-options">
+                    <button class="generation-btn primary" onclick="generateSectionIComment()"><svg class="icon icon--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg><span>Generate Section I Comment</span></button>
+                    <button class="generation-btn" onclick="regenerateWithStyle('comprehensive')"><svg class="icon icon--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg><span>Comprehensive</span></button>
+                    <button class="generation-btn" onclick="regenerateWithStyle('concise')"><svg class="icon icon--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg><span>Concise</span></button>
+                    <button class="generation-btn" onclick="regenerateWithStyle('promotion-focused')"><svg class="icon icon--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg><span>Promotion-Focused</span></button>
+                </div>
+            </div>
+            
+            <div>
+                <h3 style="color: #1e3c72; margin-bottom: 15px;">Generated Section I Comment</h3>
+                <p style="color: #666; margin-bottom: 10px; font-size: 14px;">
+                    Review and edit the generated comment below. This will be included in your final FITREP summary.
+                </p>
+                <textarea class="section-i-textarea" id="sectionITextarea" 
+                         placeholder="Click 'Generate Section I Comment' above to create a professional narrative based on your evaluations..."></textarea>
+                <div class="word-count-display" id="sectionIWordCount">0 words (Recommended: 200-400 words)</div>
+            </div>
+            
+            <div class="button-row">
+                <button class="btn btn-meets" onclick="finalizeSectionI()">Continue to Summary</button>
+            </div>
+        </div>
+
+
+
+        <!-- Directed Comments Card -->
+        <div class="directed-comments-card" id="directedCommentsCard">
+            <h2 style="text-align: center; color: #1e3c72; margin-bottom: 20px;">Directed Comments Selection</h2>
+            <p style="text-align: center; color: #666; margin-bottom: 30px;">
+                Select applicable directed comments that must be included in Section I per MCO 1610.7B. 
+                Click to select/deselect each comment that applies to this evaluation.
+            </p>
+            
+            <div class="directed-comments-grid" id="directedCommentsGrid"></div>
+            
+            <div class="selected-comments-section" id="selectedCommentsSection">
+                <h3 style="color: #1e3c72; margin-bottom: 20px;">Complete Selected Directed Comments</h3>
+                <p style="color: #666; margin-bottom: 20px;">Fill in the required information for each selected comment:</p>
+                <div id="selectedCommentsForm"></div>
+            </div>
+            
+            <div class="button-row">
+                <button class="btn btn-meets" onclick="finalizeDirectedComments()">Continue to Section I</button>
+            </div>
+        </div>
+
+        <!-- Summary Card -->
+        <div class="summary-card" id="summaryCard">
+            <h2 style="text-align: center; color: #1e3c72; margin-bottom: 20px;">FITREP Evaluation Summary</h2>
+            <div class="fitrep-average" id="fitrepAverage"></div>
+            <div id="evaluationMeta" style="text-align: center; margin: 20px 0; color: #666;"></div>
+            <div class="summary-grid" id="summaryGrid"></div>
+            <div class="export-section">
+                <div class="button-row">
+                    <button class="btn btn-export" onclick="window.print()">Print Summary</button>
+                    <!-- PoC: View RS Dashboard removed. No persistence is allowed in PoC mode. -->
+                    <button class="btn btn-export" id="startOverBtn" onclick="resetEvaluation()">Start Over</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Disclaimer Modal -->
+    <div id="disclaimer-modal" class="sa-modal" role="dialog" aria-modal="true" aria-labelledby="disclaimer-modal-title" style="display: none;">
+        <div class="sa-modal-dialog" role="document">
+            <div class="sa-modal-content">
+                <div class="sa-modal-header">
+                    <h5 id="disclaimer-modal-title" class="sa-modal-title">Disclaimer</h5>
+                    <button type="button" class="sa-close" aria-label="Close" onclick="modalController.closeById('disclaimer-modal')">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="sa-modal-body">
+                                <p>DATA CATEGORY: SYNTHETIC / TEST DATA ONLY>PROTECTION LEVEL: UNSECURED POC>Notice: This system is not authorized for the storage or processing of PII, CUI, or HIPAA regulated data. All data shown is for demonstration purposes.</p>
+                            </div>
+                <div class="sa-modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="modalController.closeById('disclaimer-modal')">Acknowledge</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Justification Modal -->
+    <div class="justification-modal" id="justificationModal" aria-labelledby="justificationTitle" aria-describedby="justificationDesc" aria-hidden="true">
+        <div class="justification-content">
+            <div class="justification-header">
+                <div class="justification-title" id="justificationTitle"></div>
+                <p id="justificationDesc">Please provide justification for this marking:</p>
+            </div>
+            
+            <!-- PoC: voice input button removed. Voice transcription routes audio to third-party endpoints, prohibited under PoC charter. -->
+
+            <textarea class="justification-textarea" id="justificationText" 
+                     placeholder="Enter specific examples and evidence to support this evaluation..."></textarea>
+            
+            <div class="textarea-info">
+                <span class="word-count" id="wordCount" aria-live="polite" role="status">0 words</span>
+                <span>Minimum recommended: 30 words</span>
+            </div>
+            
+            <div class="justification-buttons">
+                <button class="btn btn-cancel" onclick="cancelJustification()" aria-label="Cancel justification">Cancel</button>
+                <button class="btn btn-save" onclick="saveJustification()" aria-label="Save justification and continue">Save & Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Re-evaluation Modal -->
+    <div class="reevaluate-modal" id="reevaluateModal" aria-labelledby="reevaluateTitle" aria-describedby="reevaluateDesc" aria-hidden="true">
+        <div class="reevaluate-content">
+            <div class="reevaluate-header">
+                <h3 id="reevaluateTitle"></h3>
+                <p id="reevaluateDesc">You are re-evaluating this trait. Your current evaluation is shown below.</p>
+            </div>
+            
+            <div class="reevaluate-body">
+                <div class="current-evaluation">
+                    <h4>Current Evaluation</h4>
+                    <div class="current-eval-display" id="currentEvalDisplay"></div>
+                    <div class="current-eval-criteria" id="currentEvalCriteria"></div>
+                    <div class="current-eval-justification" id="currentEvalJustification"></div>
+                </div>
+            </div>
+            
+            <div class="reevaluate-options">
+                <h4>Choose an option:</h4>
+                <p>You can keep the current evaluation or start the trait evaluation process over.</p>
+                <div class="reevaluate-buttons">
+                    <button class="btn btn-secondary" onclick="cancelReevaluation()" aria-label="Keep current evaluation">Keep Current</button>
+                    <button class="btn btn-meets" onclick="startReevaluation()" aria-label="Start re-evaluation">Re-evaluate Trait</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PoC Footer: single-line warning body. -->
+    <footer class="poc-footer disclaimer-footer" role="contentinfo">
+        <div class="poc-footer__content">
+            <p class="poc-footer__body">Not a system of record. Synthetic data only. Do not enter real Marine names, ranks, EDIPIs, evaluation periods, or narrative text. Not authorized for live personnel data, PII, CUI, or HIPAA-regulated content.</p>
+        </div>
+    </footer>
+
+    <!-- Help Modal -->
+    <div class="help-modal" id="helpModal" aria-labelledby="helpModalTitle" aria-describedby="helpModalDesc" aria-hidden="true">
+        <div class="help-content">
+            <button class="help-close" onclick="closeHelpModal()" aria-label="Close help">&times;</button>
+            
+            <div id="helpModalTitle" class="setup-title" style="text-align: center; margin-bottom: 25px;">How This Tool Works</div>
+            <p id="helpModalDesc" class="sr-only">Information about unbiased evaluation philosophy and tool usage.</p>
+            
+            <div style="margin-bottom: 20px;">
+                <h3><svg class="icon icon--md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Unbiased Evaluation Philosophy</h3>
+                <p style="line-height: 1.6; margin-bottom: 15px;">
+                    Traditional FITREP marking often suffers from <strong>grade inflation</strong> and <strong>preconceived notions</strong>. 
+                    Evaluators frequently decide on a final grade first, then justify it backward. This tool eliminates that bias.
+                </p>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h3><svg class="icon icon--md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>Left-to-Right Methodology</h3>
+                <p style="line-height: 1.6; margin-bottom: 10px;">For each trait, you'll be presented with descriptive performance standards:</p>
+                <ul style="margin-left: 20px; line-height: 1.6;">
+                    <li><strong>Start at B:</strong> "Meets requirements, maintains status quo"</li>
+                    <li><strong>Move to D:</strong> "Consistently produces quality results, improves unit performance"</li>
+                    <li><strong>Move to F:</strong> "Results far surpass expectations, significant impact"</li>
+                </ul>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h3><svg class="icon icon--md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Three-Choice Decision Making</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
+                    <div style="background: #ffe6e6; padding: 10px; border-radius: 6px; text-align: center;">
+                        <strong style="color: #d32f2f;">Does Not Meet</strong><br>
+                        <small>Select previous grade</small>
+                    </div>
+                    <div style="background: #e8f5e8; padding: 10px; border-radius: 6px; text-align: center;">
+                        <strong style="color: #2e7d32;">Meets</strong><br>
+                        <small>Accept current standard</small>
+                    </div>
+                    <div style="background: #e3f2fd; padding: 10px; border-radius: 6px; text-align: center;">
+                        <strong style="color: #1976d2;">Surpasses</strong><br>
+                        <small>Move to next level</small>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h3><svg class="icon icon--md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Required Justification</h3>
+                <p style="line-height: 1.6;">
+                    Every marking decision requires <strong>specific justification</strong> with examples and evidence. 
+                    This ensures accountability and provides valuable feedback to the Marine being evaluated.
+                </p>
+            </div>
+
+            <div style="background: #f0f7ff; padding: 15px; border-radius: 8px; border-left: 4px solid #2196F3;">
+                <h4><svg class="icon icon--md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>Result: Objective, Defensible Evaluations</h4>
+                <p style="line-height: 1.6; margin: 0; font-size: 14px;">
+                    By evaluating performance against established standards rather than predetermined outcomes, 
+                    this tool produces more accurate, fair, and legally defensible FITREP markings that truly reflect Marine performance.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fix the bottom link markup -->
+    <!-- Social banner moved into breadcrumb; remove bottom banner to prevent duplication -->
+
+    <!-- Mode Selection Card: PoC supports single methodology walkthrough only. -->
+    <div class="profile-card active" id="modeSelectionCard">
+        <div class="profile-title">FITREP Methodology Aid (Proof of Concept)</div>
+        <p class="profile-description">This tool demonstrates the left-to-right marking methodology against synthetic Marines only.</p>
+
+        <div class="mode-options">
+            <button class="mode-option-btn" onclick="startStandaloneMode()">
+                <div class="mode-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+                <div class="mode-title">Begin Methodology Walkthrough</div>
+                <div class="mode-description">Run a single evaluation against a synthetic persona. No data is saved.</div>
+            </button>
+        </div>
+
+        <div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+            <p style="font-size: 13px; color: #b71c1c;">
+                <strong>PoC constraint:</strong> Use synthetic identifiers only. No real Marine names, EDIPIs, ranks tied to individuals, or narrative text.
+            </p>
+        </div>
+
+        <!-- PoC: What's New changelog removed. Prior entries referenced Supabase accounts, persistence, login - all disallowed under Phase 1. -->
+    </div>
+
+    <!-- PoC: profileLoginCard, profileDashboardCard, and resetPasswordModal removed under Phase 1 charter compliance. -->
+    <!-- PoC: profileLoginCard removed. Authentication, account creation, and password reset are prohibited under Phase 1 charter. -->
+
+    <!-- PoC: profileDashboardCard (RS Dashboard) and resetPasswordModal removed entirely under Phase 1. Manage Data dropdown, rank filter bar, profile grid, evaluations list, sync, upload, export, template, and rank summary all removed. -->
+
+    <!-- Scripts - PoC mode. Render API config block removed. CDN dependencies removed. -->
+    <!-- All modules with cloud, persistence, or external transmission paths are removed. -->
+    <!-- Methodology engine modules retained. config.js, syntheticFixture.js, pocBanner.js already loaded in head. -->
+    <script>console.log('[poc] index.html body loaded.');</script>
+    <!-- PoC: errorLogger removed. Module had remote fetch and localStorage paths. -->
+    <script src="js/constants.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/militaryData.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/formCore.js"></script>
+    <script src="js/formStore.js"></script>
+    <script src="js/formUI.js"></script>
+    <script src="js/validation.js"></script>
+    <script src="js/sectionI.js"></script>
+    <script src="js/directedComments.js"></script>
+    <script src="js/memoryManager.js"></script>
+    <script src="js/performance.js"></script>
+    <script src="js/ui-states.js"></script>
+    <script src="js/accessibility.js"></script>
+    <script src="js/tooltips.js"></script>
+    <script src="js/modals.js"></script>
+    <script src="js/formValidationCore.js"></script>
+    <script src="js/formValidationUI.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/evaluation.js"></script>
+    <script src="js/app.js"></script>
+
+    <!-- PoC: saveProfileModal, editProfileModal, pendingSyncModal removed under Phase 1. No persistence, no sync, no profile editing. -->
+    <!-- PoC: feedback.js script reference removed. External transmission paths are prohibited. -->
+    </body>
+    </html>

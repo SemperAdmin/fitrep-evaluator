@@ -1,0 +1,322 @@
+/* =============================================================================
+   FITREP Evaluator - Sticky Chrome and App Header (single-row compact)
+   Token-driven styling per Semper Admin Style Guide v1.2.
+   Loaded AFTER styles.css so these rules override legacy header CSS.
+
+   Layout intent:
+   - #stickyChrome wraps the PoC banner (injected by pocBanner.js) and the .header.
+   - The chrome is position: sticky at top of the viewport.
+   - The banner sits on top as a single thin line.
+   - The header sits directly below in a SINGLE ROW at desktop widths:
+     [Logo] [Title + Subtitle + Credit inline] [Help Video Theme controls]
+   - Total chrome height target: ~58 pixels (banner 22 + header 36).
+   - At narrow viewports the header falls back to a stacked layout.
+   ============================================================================= */
+
+/* --- Sticky chrome wrapper ------------------------------------------------- */
+#stickyChrome.sticky-chrome {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--color-bg-elev);
+  border-bottom: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+}
+
+/* --- Header container: single-row flex at desktop ------------------------- */
+#stickyChrome .header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 6px var(--space-6);
+  background: var(--color-bg-elev);
+  color: var(--color-foreground);
+  max-width: 1400px;
+  margin: 0 auto;
+  flex-wrap: nowrap;
+}
+
+@media (max-width: 960px) {
+  #stickyChrome .header {
+    flex-wrap: wrap;
+    padding: 6px var(--space-4);
+    gap: var(--space-2);
+  }
+}
+
+/* --- Branding row: takes remaining horizontal space ----------------------- */
+#stickyChrome .header-branding {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+#stickyChrome .header-logo {
+  height: 36px;
+  width: auto;
+  flex-shrink: 0;
+  display: block;
+}
+
+#stickyChrome .header-titles {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  min-width: 0;
+  flex-wrap: nowrap;
+  overflow: hidden;
+}
+
+#stickyChrome .header-titles h1 {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  line-height: 1;
+  color: var(--color-foreground);
+  margin: 0;
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+#stickyChrome .header-subtitle-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  flex-wrap: nowrap;
+  min-width: 0;
+  overflow: hidden;
+}
+
+#stickyChrome .header-subtitle {
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  color: var(--color-muted-foreground);
+  margin: 0;
+  line-height: 1;
+  font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#stickyChrome .header-credit {
+  font-family: var(--font-body);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-subtle-foreground);
+  line-height: 1;
+  padding: 2px 5px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xs);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Hide subtitle row entirely at narrow widths so title remains legible. */
+@media (max-width: 760px) {
+  #stickyChrome .header-subtitle-row {
+    display: none;
+  }
+}
+
+/* --- Info row -------------------------------------------------------------- */
+#stickyChrome .header-info {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  flex-wrap: nowrap;
+  flex-shrink: 0;
+}
+
+@media (max-width: 960px) {
+  #stickyChrome .header-info {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+}
+
+#stickyChrome .header-divider {
+  color: var(--color-border-strong);
+  font-weight: 700;
+  user-select: none;
+  font-size: var(--text-xs);
+  line-height: 1;
+}
+
+#stickyChrome .header-link,
+#stickyChrome .header-link.header-link--button,
+#stickyChrome button.header-link {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-foreground);
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  line-height: 1;
+  transition: color var(--motion-fast) var(--easing-out),
+              background var(--motion-fast) var(--easing-out);
+}
+
+#stickyChrome .header-link:hover,
+#stickyChrome button.header-link:hover {
+  color: var(--color-usmc-scarlet);
+  background: color-mix(in srgb, var(--color-usmc-scarlet) 8%, transparent);
+}
+
+#stickyChrome .header-link:focus-visible,
+#stickyChrome button.header-link:focus-visible {
+  outline: 3px solid var(--color-ring);
+  outline-offset: 2px;
+}
+
+#stickyChrome .header-link .link-icon {
+  flex-shrink: 0;
+  color: var(--color-usmc-scarlet);
+  width: 14px;
+  height: 14px;
+}
+
+#stickyChrome .header-link.header-link--button .link-icon {
+  color: var(--color-marine-blue);
+}
+
+body.dark #stickyChrome .header-link.header-link--button .link-icon {
+  color: var(--color-marine-blue-100);
+}
+
+/* --- Theme toggle ---------------------------------------------------------- */
+#stickyChrome .theme-toggle {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-chip);
+  padding: 4px 10px;
+  color: var(--color-foreground);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1;
+  transition: background var(--motion-fast) var(--easing-out),
+              border-color var(--motion-fast) var(--easing-out),
+              color var(--motion-fast) var(--easing-out);
+}
+
+#stickyChrome .theme-toggle:hover {
+  background: var(--color-muted);
+  border-color: var(--color-border-strong);
+}
+
+#stickyChrome .theme-toggle:focus-visible {
+  outline: 3px solid var(--color-ring);
+  outline-offset: 2px;
+}
+
+#stickyChrome .theme-toggle .theme-icon {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  color: var(--color-brass);
+}
+
+/* Show moon by default, sun when dark mode is active.
+   The .dark class is applied to body by toggleTheme(). */
+#stickyChrome .theme-toggle .theme-icon--sun {
+  display: none;
+}
+body.dark #stickyChrome .theme-toggle .theme-icon--moon {
+  display: none;
+}
+body.dark #stickyChrome .theme-toggle .theme-icon--sun {
+  display: inline-block;
+  color: var(--color-brass-300);
+}
+
+/* --- Navigation row (collapsed by default via [hidden]) ------------------- */
+#stickyChrome .header-nav {
+  width: 100%;
+}
+
+#stickyChrome .header-nav[hidden] {
+  display: none;
+}
+
+#stickyChrome .breadcrumbs {
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  color: var(--color-muted-foreground);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 4px 0;
+}
+
+#stickyChrome .breadcrumbs:empty {
+  display: none;
+}
+
+/* --- Progress row (collapsed by default via [hidden]) --------------------- */
+#stickyChrome .progress-section {
+  width: 100%;
+}
+
+#stickyChrome .progress-section[hidden] {
+  display: none;
+}
+
+#stickyChrome .progress-details {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-muted-foreground);
+  margin-bottom: 4px;
+}
+
+#stickyChrome .progress-bar {
+  height: 3px;
+  background: var(--color-muted);
+  border-radius: var(--radius-chip);
+  overflow: hidden;
+}
+
+#stickyChrome .progress-fill {
+  height: 100%;
+  background: var(--color-usmc-scarlet);
+  transition: width var(--motion-default) var(--easing-out);
+  width: 0;
+}
+
+#stickyChrome .auto-save-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  color: var(--color-subtle-foreground);
+}
+
+/* --- Dark mode visual reinforcement --------------------------------------- */
+body.dark #stickyChrome.sticky-chrome,
+.dark #stickyChrome.sticky-chrome {
+  background: var(--color-bg-elev);
+  border-bottom-color: var(--color-border);
+}
