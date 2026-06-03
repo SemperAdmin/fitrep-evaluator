@@ -14,6 +14,8 @@
     <link rel="stylesheet" href="css/poc-app.css">
     <!-- PoC banner loads LAST so its raw warning treatment cascade-wins over brand tokens. Deliberate visual distinction. -->
     <link rel="stylesheet" href="css/poc-banner.css">
+    <!-- Legal hub modal and consent styles -->
+    <link rel="stylesheet" href="css/legal-hub.css">
     <!-- Explicit favicon to avoid default /favicon.ico 404 -->
     <link rel="icon" type="image/png" href="assets/images/Logo.png">
     <link rel="shortcut icon" href="assets/images/Logo.png">
@@ -21,6 +23,8 @@
     <script src="js/config.js"></script>
     <!-- PoC banner script gates user interaction behind a forced acknowledgment -->
     <script src="js/pocBanner.js"></script>
+    <!-- Legal consent management - clickwrap ToS, legal hub, document viewers -->
+    <script src="js/legalConsent.js"></script>
     <!-- Synthetic data fixture is the only acceptable input source -->
     <script src="js/syntheticFixture.js"></script>
 </head>
@@ -406,8 +410,17 @@
                     </button>
                 </div>
                 <div class="sa-modal-body">
-                                <p>DATA CATEGORY: SYNTHETIC / TEST DATA ONLY>PROTECTION LEVEL: UNSECURED POC>Notice: This system is not authorized for the storage or processing of PII, CUI, or HIPAA regulated data. All data shown is for demonstration purposes.</p>
-                            </div>
+                    <p><strong>DATA CATEGORY:</strong> Synthetic / Test Data Only</p>
+                    <p><strong>PROTECTION LEVEL:</strong> Unsecured PoC</p>
+                    <p><strong>Notice:</strong> This system is not authorized for the storage or processing of PII, CUI, or HIPAA regulated data. All data shown is for demonstration purposes.</p>
+                    <hr style="margin: 16px 0; border: none; border-top: 1px solid #ddd;">
+                    <p style="font-size: 12px; color: #666;">
+                        For complete legal information, view our:
+                        <a href="#" onclick="event.preventDefault(); openLegalDocumentModal('privacy');" style="color: #1976d2; text-decoration: underline;">Privacy Policy</a> •
+                        <a href="#" onclick="event.preventDefault(); openLegalDocumentModal('terms');" style="color: #1976d2; text-decoration: underline;">Terms of Service</a> •
+                        <a href="#" onclick="event.preventDefault(); openLegalDocumentModal('disclaimer');" style="color: #1976d2; text-decoration: underline;">Disclaimer</a>
+                    </p>
+                </div>
                 <div class="sa-modal-footer">
                     <button type="button" class="btn btn-primary" onclick="modalController.closeById('disclaimer-modal')">Acknowledge</button>
                 </div>
