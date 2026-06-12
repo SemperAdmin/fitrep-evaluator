@@ -71,6 +71,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Sync occasion availability to the initial rank selection (Phase 3, MCO 1610.7B ch. 3)
+    try { if (typeof window.syncOccasionAvailability === 'function') window.syncOccasionAvailability(); } catch (_) { if (typeof logError === 'function') logError(_); }
+
     // Dev-only dispatch removed; production UI should not expose workflow controls here
 });
 

@@ -118,9 +118,108 @@
   return result;
   }
 
+  // --- Rank-aware occasion-code validation (MCO 1610.7B ch. 3) ---
+  // Order of rules below mirrors docs/MCO_1610.7B.md.
+
+  // The thirteen occasion codes for grades Sergeant through Colonel,
+  // listed in precedence order (MCO 1610.7B, ch. 3, paras 3b/3c; md:1196-1220).
+  const ALL_OCCASIONS = Object.freeze(['GC','DC','CH','TR','CD','TD','FD','EN','CS','AN','AR','SA','RT']);
+
+  // Non-lieutenants (Sgt–Col except 2ndLt/1stLt): SA is lieutenants-only
+  // (md:1219,1508-1511) and AN is allowed; SA is excluded.
+  const NOT_LT = ALL_OCCASIONS.filter(c => c !== 'SA');
+
+  // Lieutenants (2ndLt/1stLt): SA allowed, AN excluded (md:1460-1461).
+  const LT = ALL_OCCASIONS.filter(c => c !== 'AN');
+
+  // Allowed occasion codes per #marineRankSelect option value.
+  // Sgt–Col use NOT_LT, lieutenants use LT. General officer rows are
+  // auditable per md:1185-1194: MajGen = CH,TR,GC,TD,FD; BGen adds AN;
+  // Gen & LtGen receive no evaluations (md:1187-1188).
+  const RANK_ALLOWED_OCCASIONS = Object.freeze({
+    Sgt: NOT_LT,
+    SSgt: NOT_LT,
+    GySgt: NOT_LT,
+    MSgt: NOT_LT,
+    '1stSgt': NOT_LT,
+    MGySgt: NOT_LT,
+    SgtMaj: NOT_LT,
+    WO: NOT_LT,
+    CWO2: NOT_LT,
+    CWO3: NOT_LT,
+    CWO4: NOT_LT,
+    CWO5: NOT_LT,
+    '2ndLt': LT,
+    '1stLt': LT,
+    Capt: NOT_LT,
+    Maj: NOT_LT,
+    LtCol: NOT_LT,
+    Col: NOT_LT,
+    BGen: Object.freeze(['CH','TR','GC','TD','FD','AN']),
+    MajGen: Object.freeze(['CH','TR','GC','TD','FD']),
+    LtGen: Object.freeze([]),
+    Gen: Object.freeze([])
+  });
+
+  /**
+   * Return the array of occasion codes allowed for a given rank.
+   * @param {string} rank Rank key matching #marineRankSelect option values.
+   * @returns {string[]|null} Allowed codes, or null if the rank is unknown.
+   */
+  function getAllowedOccasions(rank) {
+    return Object.prototype.hasOwnProperty.call(RANK_ALLOWED_OCCASIONS, rank)
+      ? RANK_ALLOWED_OCCASIONS[rank]
+      : null;
+  }
+
+  /**
+   * Validate a rank/occasion combination per MCO 1610.7B ch. 3.
+   * Empty rank or occasion is treated as valid (the required-field check owns
+   * that). Unknown ranks fail open (and are logged) so the gate never blocks a
+   * legitimate workflow on map drift.
+   * @param {string} rank Rank key matching #marineRankSelect option values.
+   * @param {string} occasion Occasion code from ALL_OCCASIONS.
+   * @returns {{valid: boolean, message?: string}}
+   */
+  function validateRankOccasion(rank, occasion) {
+    if (!rank || !occasion) return { valid: true };
+    const allowed = getAllowedOccasions(rank);
+    if (allowed === null) {
+      if (typeof logError === 'function') logError(new Error('Unknown rank in occasion validation: ' + rank));
+      return { valid: true };
+    }
+    if (allowed.indexOf(occasion) !== -1) return { valid: true };
+    // Generals and Lieutenant Generals receive no evaluations (md:1187-1188).
+    if (rank === 'Gen' || rank === 'LtGen') {
+      return {
+        valid: false,
+        message: 'Generals and Lieutenant Generals do not receive performance evaluations (MCO 1610.7B, ch. 3, para 3b). Selected rank: ' + rank + '.'
+      };
+    }
+    // SA is for Second and First Lieutenants only (md:1219,1508-1511).
+    if (occasion === 'SA') {
+      return {
+        valid: false,
+        message: 'Semiannual (SA) reports are for Second and First Lieutenants only (MCO 1610.7B, ch. 3). Selected rank: ' + rank + '.'
+      };
+    }
+    // AN excludes lieutenants; active-duty lieutenants receive SA (md:1460-1461).
+    if (occasion === 'AN') {
+      return {
+        valid: false,
+        message: 'Annual (AN) reports exclude Second and First Lieutenants (MCO 1610.7B, ch. 3); active-duty lieutenants receive Semiannual (SA) reports.'
+      };
+    }
+    // Generic fallback (e.g. a general-officer occasion not on their list).
+    return {
+      valid: false,
+      message: 'Occasion ' + occasion + ' is not authorized for the selected rank ' + rank + ' (MCO 1610.7B, ch. 3).'
+    };
+  }
+
   // Export
-  try { window.FormValidationCore = { ValidationRules, parseRules, validateValue, errorMessageFor, validateField, validateFormPayload }; } catch (_) { if (typeof logError === "function") logError(_); }
+  try { window.FormValidationCore = { ValidationRules, parseRules, validateValue, errorMessageFor, validateField, validateFormPayload, ALL_OCCASIONS, RANK_ALLOWED_OCCASIONS, getAllowedOccasions, validateRankOccasion }; } catch (_) { if (typeof logError === "function") logError(_); }
   if (typeof module !== 'undefined') {
-    module.exports = { ValidationRules, parseRules, validateValue, errorMessageFor, validateField, validateFormPayload };
+    module.exports = { ValidationRules, parseRules, validateValue, errorMessageFor, validateField, validateFormPayload, ALL_OCCASIONS, RANK_ALLOWED_OCCASIONS, getAllowedOccasions, validateRankOccasion };
   }
 })();

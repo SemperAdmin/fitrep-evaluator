@@ -213,6 +213,15 @@ function startEvaluation() {
         return;
     }
 
+    // Rank/occasion rules per MCO 1610.7B ch.3 (docs/MCO_1610.7B.md:1185-1220,1454-1461,1508-1511)
+    try {
+        const fvc = global.FormValidationCore;
+        if (fvc && typeof fvc.validateRankOccasion === 'function') {
+            const ruleCheck = fvc.validateRankOccasion(marineRank, occasionType);
+            if (!ruleCheck.valid) { alert(ruleCheck.message); return; }
+        }
+    } catch (_) { if (typeof logError === 'function') logError(_); }
+
     // Update evaluationMeta properties instead of reassigning to preserve object reference
     // Clear existing properties first
     for (const key in evaluationMeta) {
@@ -258,6 +267,36 @@ function startEvaluation() {
     
     updateProgress();
     renderCurrentTrait();
+}
+
+/**
+ * Live UX: disable occasion <option>s not allowed for the selected rank
+ * per MCO 1610.7B ch. 3. Rank empty/unknown => allowed null => all enabled.
+ * If the current selection becomes disabled, reset it and warn the user.
+ */
+function syncOccasionAvailability() {
+    try {
+        const rankEl = document.getElementById('marineRankSelect');
+        const occEl = document.getElementById('evaluationOccasionSetup');
+        if (!occEl) return;
+        const rank = rankEl ? rankEl.value : '';
+        const fvc = global.FormValidationCore;
+        const allowed = fvc && typeof fvc.getAllowedOccasions === 'function'
+            ? fvc.getAllowedOccasions(rank)
+            : null;
+        const prevValue = occEl.value;
+        for (const opt of occEl.options) {
+            if (opt.value === '') continue;
+            opt.disabled = allowed ? allowed.indexOf(opt.value) === -1 : false;
+        }
+        if (prevValue && allowed && allowed.indexOf(prevValue) === -1) {
+            occEl.value = '';
+            const check = fvc && typeof fvc.validateRankOccasion === 'function'
+                ? fvc.validateRankOccasion(rank, prevValue)
+                : null;
+            if (check && check.message) showToast(check.message, 'warning');
+        }
+    } catch (_) { if (typeof logError === 'function') logError(_); }
 }
 
 function initializeTraits() {
@@ -1167,6 +1206,7 @@ function showSummary() {
 // Expose module API and backward-compatible shims
 const EvaluationAPI = {
     startEvaluation,
+    syncOccasionAvailability,
     getSectionProgress,
     getSectionInfo,
     getGradeMeaning,
@@ -1211,6 +1251,7 @@ global.Evaluation = EvaluationAPI;
 
 // Backward-compat for inline event handlers in HTML
 global.startEvaluation = EvaluationAPI.startEvaluation;
+global.syncOccasionAvailability = syncOccasionAvailability;
 global.goBackToLastTrait = EvaluationAPI.goBackToLastTrait;
 global.proceedToDirectedComments = EvaluationAPI.proceedToDirectedComments;
 global.saveJustification = EvaluationAPI.saveJustification;

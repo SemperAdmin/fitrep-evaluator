@@ -69,7 +69,8 @@
     'accordion-toggle': function (el) {
       if (el.nextElementSibling) el.nextElementSibling.setAttribute('aria-expanded', el.checked);
       callGlobal('saveAccordionState', [el.dataset.accordionTitle, el.checked]);
-    }
+    },
+    'setup-rank-changed': function () { callGlobal('syncOccasionAvailability'); }
   };
 
   var INPUT_ACTIONS = {
