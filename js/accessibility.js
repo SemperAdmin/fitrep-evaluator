@@ -33,6 +33,12 @@
     }
   });
 
-  window.A11y = { initRequiredIndicators, focusFirstInteractive };
+  // Merge into any existing A11y (utils.js publishes openDialog/closeDialog/
+  // trapFocus/announce/focus restoration earlier in load order). Reassigning
+  // here would erase those, breaking modal accessibility.
+  window.A11y = Object.assign(window.A11y || {}, {
+    initRequiredIndicators,
+    focusFirstInteractive
+  });
 })();
 
