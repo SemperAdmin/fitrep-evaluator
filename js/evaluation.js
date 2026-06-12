@@ -553,18 +553,16 @@ function renderCompletedTraitsAccordion() {
         let traitsHTML = '';
         traits.forEach(trait => {
             const safeTraitName = escapeHtml(trait.trait || '');
-            const gradeDesc = getGradeDescription(trait.grade || 'B');
-            const safeGradeDesc = escapeHtml(gradeDesc);
-            const gradeClass = `grade-${(trait.grade || 'b').toLowerCase()}`;
             const safeJustification = trait.justification
                 ? escapeHtml(trait.justification)
                 : '<em>No justification provided</em>';
 
+            // Show only the Reporting Senior's own input (trait + justification).
+            // The grade is deliberately not revealed before the summary.
             traitsHTML += `
                 <div class="accordion-trait-item">
                     <div class="accordion-trait-row">
                         <span class="accordion-trait-name">${safeTraitName}</span>
-                        <span class="accordion-grade-desc ${gradeClass}">${safeGradeDesc}</span>
                     </div>
                     <div class="accordion-trait-justification">${safeJustification}</div>
                     <button class="accordion-edit-btn" data-trait-key="${trait.key}">
@@ -869,25 +867,18 @@ function populateReviewScreen() {
     sections.forEach(sectionTitle => {
         const traits = sectionGroups[sectionTitle];
          const traitsHTML = traits.map(trait => {
-            const gradeDescription = getGradeDescription(trait.grade);
             const fullText = String(trait.justification || '').trim();
 
             const safeTraitName = escapeHtml(trait.trait);
-            const safeGradeDesc = escapeHtml(gradeDescription);
             const safeJustification = fullText ? nl2br(fullText) : '<em>No justification provided</em>';
             const adverseClass = (trait.grade === 'A') ? ' review-trait-item--adverse' : '';
 
              return `
                  <div class="review-trait-item${adverseClass}" id="review-item-${trait.key}">
-                     <div class="review-trait-header"> 
-                         <div class="review-trait-name">${safeTraitName}</div> 
-                     </div> 
-                     <div class="review-trait-criteria"> 
-                         <div class="criteria-meets"> 
-                             <strong>Selected Standard:</strong> ${safeGradeDesc} 
-                         </div> 
-                     </div> 
-                     <div class="review-trait-justification" style="white-space: pre-line;"> 
+                     <div class="review-trait-header">
+                         <div class="review-trait-name">${safeTraitName}</div>
+                     </div>
+                     <div class="review-trait-justification" style="white-space: pre-line;">
                          ${safeJustification} 
                      </div> 
                      <div class="button-row" style="margin-top: 10px;"> 
@@ -957,22 +948,17 @@ function showReevaluationModal(trait, traitKey) {
     const currentEvalDisplay = document.getElementById('currentEvalDisplay');
     const displayHtml = `
         <div style="display: flex; justify-content: center; align-items: center; gap: 20px; margin: 15px 0;">
-            <div class="grade-display ${getGradeClass(currentResult.grade)}" style="padding: 15px; margin: 0;">
+            <div class="grade-display" style="padding: 15px; margin: 0;">
                 <strong>Current Evaluation</strong>
             </div>
         </div>
     `;
     try { if (window.Rendering) window.Rendering.renderHTML(currentEvalDisplay, displayHtml); else currentEvalDisplay.innerHTML = displayHtml; } catch(_) { currentEvalDisplay.innerHTML = displayHtml; }
-    
-    // Display current criteria
+
+    // Current standard intentionally hidden: do not reveal the grade before the
+    // summary. Only the Reporting Senior's own justification (below) is shown.
     const currentEvalCriteria = document.getElementById('currentEvalCriteria');
-    const gradeDescription = getGradeDescription(currentResult.grade);
-    const criteriaHtml = `
-        <div class="criteria-meets">
-            <strong>Selected Standard:</strong> ${gradeDescription}
-        </div>
-    `;
-    try { if (window.Rendering) window.Rendering.renderHTML(currentEvalCriteria, criteriaHtml); else currentEvalCriteria.innerHTML = criteriaHtml; } catch(_) { currentEvalCriteria.innerHTML = criteriaHtml; }
+    if (currentEvalCriteria) currentEvalCriteria.innerHTML = '';
     
     // Display current justification
     const currentEvalJustification = document.getElementById('currentEvalJustification');

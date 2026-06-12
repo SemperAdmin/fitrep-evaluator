@@ -167,11 +167,11 @@ function buildAdverseNoticeText(findings) {
     const aTraits = Array.isArray(f.aTraits) ? f.aTraits : [];
     const reasons = Array.isArray(f.reasons) ? f.reasons : [];
     return 'ADVERSE REPORT. One or more conditions render this report adverse per MCO 1610.7B ch. 5. '
-        + (aTraits.length ? 'Attribute(s) marked "A": ' + aTraits.join('; ') + '. ' : '')
+        + (aTraits.length ? 'Attribute(s) marked at the adverse (lowest) standard: ' + aTraits.join('; ') + '. ' : '')
         + (reasons.length ? reasons.join('; ') + '. ' : '')
         + 'Required: notify the MRO when the report is routed and refer the adverse report to the MRO, '
         + 'who must be afforded the opportunity to make a statement (ch. 5). A third officer sighter must '
-        + 'sight all adverse reports. Each "A" mark requires specific written justification (ch. 4 par. 7e).';
+        + 'sight all adverse reports. Each adverse mark requires specific written justification (ch. 4 par. 7e).';
 }
 
 /**
