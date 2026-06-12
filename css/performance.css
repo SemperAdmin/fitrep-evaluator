@@ -156,8 +156,8 @@
 }
 
 /* Dark Mode Skeletons */
-body.dark-mode .skeleton-avatar,
-body.dark-mode .skeleton-line {
+body.dark .skeleton-avatar,
+body.dark .skeleton-line {
     background: linear-gradient(
         90deg,
         #1e293b 25%,
