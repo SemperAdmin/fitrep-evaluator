@@ -22,7 +22,7 @@
   function focusFirstInteractive(root) {
     const sel = 'input, select, textarea, button, [tabindex]:not([tabindex="-1"])';
     const el = root.querySelector(sel);
-    if (el) { try { el.focus(); } catch (_) { if (typeof logError === "function") logError(_); } }
+    if (el) { try { el.focus(); } catch (_) { /* benign: focus is best-effort */ } }
   }
 
   // Auto-init on DOM ready
