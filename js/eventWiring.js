@@ -36,6 +36,8 @@
     'finalize-section-i': function () { callGlobal('finalizeSectionI'); },
     'finalize-directed-comments': function () { callGlobal('finalizeDirectedComments'); },
     'print': function () { window.print(); },
+    'export-copy': function () { callGlobal('exportToClipboard'); },
+    'export-download': function () { callGlobal('downloadExportFile'); },
     'reset-evaluation': function () { callGlobal('resetEvaluation'); },
     'close-modal': function (el) {
       var mc = window.ModalController;
