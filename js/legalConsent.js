@@ -488,7 +488,7 @@ For questions, contact the originating command in PoC-CHARTER.md.`
 
     // Tear down through ModalController so the focus trap, body lock, and stack
     // entry are released before the node is removed.
-    try { if (window.ModalController) window.ModalController.closeById('tosModalOverlay'); } catch (_) {}
+    try { if (window.ModalController) window.ModalController.closeById('tosModalOverlay'); } catch (_) { if (typeof logError === "function") logError(_); }
     const overlay = document.getElementById('tosModalOverlay');
     if (overlay && overlay.parentNode) {
       overlay.parentNode.removeChild(overlay);
@@ -548,7 +548,7 @@ For questions, contact the originating command in PoC-CHARTER.md.`
             focusFirst: '#tosCheckbox'
           });
         }
-      } catch (_) {}
+      } catch (_) { if (typeof logError === "function") logError(_); }
 
       console.log('[legalConsent] Terms of Service acceptance required.');
     }, 100);

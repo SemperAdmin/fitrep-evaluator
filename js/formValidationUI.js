@@ -153,5 +153,5 @@
   }
 
   // Export
-  try { window.FormValidationUI = { attachToContainer, validateField, validateForm, showSuccessBanner }; } catch (_) {}
+  try { window.FormValidationUI = { attachToContainer, validateField, validateForm, showSuccessBanner }; } catch (_) { if (typeof logError === "function") logError(_); }
 })();

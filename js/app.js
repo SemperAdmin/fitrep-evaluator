@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Initialize persistence and enhanced auto-save
-    try { if (typeof initializePersistence === 'function') initializePersistence(); } catch (_) {}
+    try { if (typeof initializePersistence === 'function') initializePersistence(); } catch (_) { if (typeof logError === "function") logError(_); }
 
     const mode = document.getElementById('modeSelectionCard');
     const setup = document.getElementById('setupCard');
@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         };
         attachGridTooltips();
-    } catch (_) {}
+    } catch (_) { if (typeof logError === "function") logError(_); }
 
     // Dev-only dispatch removed; production UI should not expose workflow controls here
 });
@@ -108,14 +108,14 @@ function startStandaloneMode() {
     if (setup) { setup.classList.add(UI.CSS.ACTIVE); setup.style.display = UI.DISPLAY.SHOW; }
 
     // Ensure RS display/input reflect standalone mode (no profile)
-    try { if (typeof updateRSSetupDisplay === 'function') updateRSSetupDisplay(); } catch (_) {}
+    try { if (typeof updateRSSetupDisplay === 'function') updateRSSetupDisplay(); } catch (_) { if (typeof logError === "function") logError(_); }
 
     // Align navigation state if available
     try {
         if (typeof jumpToStep === 'function' && typeof STEPS !== 'undefined') {
             jumpToStep(STEPS.setup);
         }
-    } catch (_) {}
+    } catch (_) { if (typeof logError === "function") logError(_); }
 
     window.scrollTo({ top: 0, behavior: 'auto' });
 }
@@ -211,7 +211,7 @@ function showDynamicTooltip(event, text) {
         tip.style.display = 'block';
         if (__tooltipHideTimer) clearTimeout(__tooltipHideTimer);
         __tooltipHideTimer = setTimeout(() => hideDynamicTooltip(), 5000);
-    } catch (_) {}
+    } catch (_) { if (typeof logError === "function") logError(_); }
 }
 
 function hideDynamicTooltip() {
@@ -225,7 +225,7 @@ function hideDynamicTooltip() {
             clearTimeout(__tooltipHideTimer);
             __tooltipHideTimer = null;
         }
-    } catch (_) {}
+    } catch (_) { if (typeof logError === "function") logError(_); }
 }
 
 // PoC: showProfileLogin stub. Login UI removed.
@@ -264,7 +264,7 @@ function updateThemeToggleButton(isDark) {
     if (label) label.textContent = isDark ? 'Light' : 'Dark';
     try {
         toggle.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
-    } catch (_) {}
+    } catch (_) { if (typeof logError === "function") logError(_); }
 }
 
 /**
@@ -280,13 +280,13 @@ try {
         window.toggleTheme = toggleTheme;
         window.initializeTheme = initializeTheme;
     }
-} catch (_) {}
+} catch (_) { if (typeof logError === "function") logError(_); }
 
 try {
-    const apply = () => { try { initializeTheme(); } catch (_) {} };
+    const apply = () => { try { initializeTheme(); } catch (_) { if (typeof logError === "function") logError(_); } };
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', apply);
     } else {
         apply();
     }
-} catch (_) {}
+} catch (_) { if (typeof logError === "function") logError(_); }

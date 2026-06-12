@@ -168,7 +168,7 @@ function showDirectedCommentsScreen() {
     dcCard.classList.add('active');
     dcCard.style.display = 'block';
 
-    try { document.getElementById('progressText').textContent = 'Directed Comments Selection'; } catch (_) {}
+    try { document.getElementById('progressText').textContent = 'Directed Comments Selection'; } catch (_) { if (typeof logError === "function") logError(_); }
 
     renderDirectedCommentsGrid();
 }

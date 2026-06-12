@@ -83,7 +83,7 @@
 
   const CONSTANTS = { API_CONFIG, UI_SETTINGS, ERROR_MESSAGES, STATUS_MESSAGES, MODAL_CONFIG };
 
-  try { window.CONSTANTS = CONSTANTS; } catch (_) {}
+  try { window.CONSTANTS = CONSTANTS; } catch (_) { if (typeof logError === "function") logError(_); }
   if (typeof module !== 'undefined') {
     module.exports = CONSTANTS;
   }

@@ -119,7 +119,7 @@
   }
 
   // Export
-  try { window.FormValidationCore = { ValidationRules, parseRules, validateValue, errorMessageFor, validateField, validateFormPayload }; } catch (_) {}
+  try { window.FormValidationCore = { ValidationRules, parseRules, validateValue, errorMessageFor, validateField, validateFormPayload }; } catch (_) { if (typeof logError === "function") logError(_); }
   if (typeof module !== 'undefined') {
     module.exports = { ValidationRules, parseRules, validateValue, errorMessageFor, validateField, validateFormPayload };
   }

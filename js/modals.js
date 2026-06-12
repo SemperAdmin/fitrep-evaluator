@@ -105,7 +105,7 @@
       wrapper.setAttribute('aria-labelledby', titleId);
       wrapper.setAttribute('aria-describedby', descId);
       Object.entries(attributes || {}).forEach(([k,v]) => {
-        try { wrapper.setAttribute(k, String(v)); } catch(_) {}
+        try { wrapper.setAttribute(k, String(v)); } catch (_) { if (typeof logError === "function") logError(_); }
       });
 
       const panel = document.createElement('div');
@@ -164,7 +164,7 @@
           modal.style.height = '100%';
           modal.style.alignItems = 'center';
           modal.style.justifyContent = 'center';
-        } catch (_) {}
+        } catch (_) { if (typeof logError === "function") logError(_); }
       } else {
         modal.style.display = DISPLAY.BLOCK;
       }
@@ -184,7 +184,7 @@
           const focusable = modal.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
           if (focusable) focusable.focus();
         }
-      } catch (_) {}
+      } catch (_) { if (typeof logError === "function") logError(_); }
 
       // Backdrop click-to-close if enabled
       const closeOnBackdrop = opts.closeOnBackdrop !== false;
@@ -212,7 +212,7 @@
         if (typeof window !== 'undefined' && window.A11y && typeof window.A11y.closeDialog === 'function') {
           window.A11y.closeDialog(modal);
         }
-      } catch (_) {}
+      } catch (_) { if (typeof logError === "function") logError(_); }
 
       // Visual hide
     modal.classList.remove(CSS.ACTIVE);
@@ -241,14 +241,14 @@
         while (this.stack.depth() > 0) {
           this.closeTop();
         }
-      } catch (_) {}
+      } catch (_) { if (typeof logError === "function") logError(_); }
       // Defensive cleanup of any orphaned backdrops
       try {
         const leftovers = document.querySelectorAll('.sa-modal-backdrop');
         leftovers.forEach(el => { if (el && el.parentNode) el.parentNode.removeChild(el); });
-      } catch (_) {}
+      } catch (_) { if (typeof logError === "function") logError(_); }
       // Ensure body lock is removed
-      try { this._removeBodyLock(); } catch (_) {}
+      try { this._removeBodyLock(); } catch (_) { if (typeof logError === "function") logError(_); }
     }
 
     isAnyOpen(){ return this.stack.depth() > 0; }
@@ -281,7 +281,7 @@
         document.body.style.position = 'fixed';
         document.body.style.top = `-${this._scrollY}px`;
         document.body.style.width = '100%';
-      } catch (_) {}
+      } catch (_) { if (typeof logError === "function") logError(_); }
       // Prevent touchmove/scroll bubbling on mobile when a modal is open
       try {
         this._touchBlock = (e) => {
@@ -295,7 +295,7 @@
           e.preventDefault();
         };
         document.addEventListener('touchmove', this._touchBlock, { passive: false });
-      } catch (_) {}
+      } catch (_) { if (typeof logError === "function") logError(_); }
       this._bodyClassApplied = true;
     }
     _removeBodyLock(){
@@ -309,19 +309,19 @@
         if (typeof window !== 'undefined' && typeof window.scrollTo === 'function') {
           window.scrollTo(0, y);
         }
-      } catch (_) {}
+      } catch (_) { if (typeof logError === "function") logError(_); }
       try {
         if (this._touchBlock) {
           document.removeEventListener('touchmove', this._touchBlock);
           this._touchBlock = null;
         }
-      } catch (_) {}
+      } catch (_) { if (typeof logError === "function") logError(_); }
       this._bodyClassApplied = false;
     }
   }
 
   // Export
-  try { window.ModalController = new ModalController(); } catch (_) {}
+  try { window.ModalController = new ModalController(); } catch (_) { if (typeof logError === "function") logError(_); }
   if (typeof module !== 'undefined') {
     module.exports = { ModalController, ModalStack };
   }

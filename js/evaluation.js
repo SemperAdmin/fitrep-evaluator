@@ -184,13 +184,13 @@ function requireLegalConsent() {
             if (typeof global.alert === 'function') {
                 global.alert('You must accept the Terms of Service before using the evaluator.');
             }
-        } catch (_) {}
+        } catch (_) { if (typeof logError === "function") logError(_); }
         // Re-present the gate if the consent module exposes a hook.
         try {
             if (typeof global.showTermsOfServiceGate === 'function') {
                 global.showTermsOfServiceGate();
             }
-        } catch (_) {}
+        } catch (_) { if (typeof logError === "function") logError(_); }
     }
     return accepted;
 }
@@ -635,7 +635,7 @@ function showJustificationModal() {
             modal.style.height = '100%';
             modal.style.alignItems = 'center';
             modal.style.justifyContent = 'center';
-        } catch (_) {}
+        } catch (_) { if (typeof logError === "function") logError(_); }
         if (window.ModalController) {
             window.ModalController.register('justificationModal', { labelledBy: 'justificationTitle', describedBy: 'justificationDesc', focusFirst: '#justificationText' });
             window.ModalController.openById('justificationModal');
@@ -654,7 +654,7 @@ function showJustificationModal() {
             modal.style.height = '100%';
             modal.style.alignItems = 'center';
             modal.style.justifyContent = 'center';
-        } catch (_) {}
+        } catch (_) { if (typeof logError === "function") logError(_); }
     }
     document.getElementById('justificationText').focus();
 }
@@ -681,15 +681,15 @@ function saveJustification() {
     // PoC: voice module removed. Voice cleanup blocks no longer needed.
 
     const modal = document.getElementById('justificationModal');
-    try { if (window.ModalController) window.ModalController.closeById('justificationModal'); } catch (_) {}
-    try { if (window.ModalController) window.ModalController.closeById('reevaluateModal'); } catch (_) {}
-    if (window.A11y) try { A11y.closeDialog(modal); } catch (_) {}
+    try { if (window.ModalController) window.ModalController.closeById('justificationModal'); } catch (_) { if (typeof logError === "function") logError(_); }
+    try { if (window.ModalController) window.ModalController.closeById('reevaluateModal'); } catch (_) { if (typeof logError === "function") logError(_); }
+    if (window.A11y) try { A11y.closeDialog(modal); } catch (_) { if (typeof logError === "function") logError(_); }
     modal.classList.remove('active');
     modal.setAttribute('aria-hidden', 'true');
-    try { modal.style.display = 'none'; } catch (_) {}
+    try { modal.style.display = 'none'; } catch (_) { if (typeof logError === "function") logError(_); }
     try {
         document.querySelectorAll('.sa-modal-backdrop[data-modal-id="justificationModal"]').forEach(b => { if (b && b.parentNode) b.parentNode.removeChild(b); });
-    } catch (_) {}
+    } catch (_) { if (typeof logError === "function") logError(_); }
     pendingEvaluation = null;
 
     // Handle post-save navigation
@@ -747,20 +747,20 @@ function cancelJustification() {
         if (window.ModalController) {
             window.ModalController.closeById('justificationModal');
         } else {
-            if (window.A11y) try { A11y.closeDialog(modal); } catch (_) {}
+            if (window.A11y) try { A11y.closeDialog(modal); } catch (_) { if (typeof logError === "function") logError(_); }
             modal.classList.remove('active');
             modal.setAttribute('aria-hidden', 'true');
-            try { modal.style.display = 'none'; } catch (_) {}
+            try { modal.style.display = 'none'; } catch (_) { if (typeof logError === "function") logError(_); }
         }
     } catch (_) {
-        if (window.A11y) try { A11y.closeDialog(modal); } catch (_) {}
+        if (window.A11y) try { A11y.closeDialog(modal); } catch (_) { if (typeof logError === "function") logError(_); }
         modal.classList.remove('active');
         modal.setAttribute('aria-hidden', 'true');
-        try { modal.style.display = 'none'; } catch (_) {}
+        try { modal.style.display = 'none'; } catch (_) { if (typeof logError === "function") logError(_); }
     }
     try {
         document.querySelectorAll('.sa-modal-backdrop[data-modal-id="justificationModal"]').forEach(b => { if (b && b.parentNode) b.parentNode.removeChild(b); });
-    } catch (_) {}
+    } catch (_) { if (typeof logError === "function") logError(_); }
     pendingEvaluation = null;
 }
 
@@ -961,19 +961,19 @@ function cancelReevaluation() {
         if (window.ModalController) {
             window.ModalController.closeById('reevaluateModal');
         } else {
-            if (window.A11y) try { A11y.closeDialog(modal); } catch (_) {}
+            if (window.A11y) try { A11y.closeDialog(modal); } catch (_) { if (typeof logError === "function") logError(_); }
             modal.classList.remove('active');
             modal.setAttribute('aria-hidden', 'true');
         }
     } catch (_) {
-        if (window.A11y) try { A11y.closeDialog(modal); } catch (_) {}
+        if (window.A11y) try { A11y.closeDialog(modal); } catch (_) { if (typeof logError === "function") logError(_); }
         modal.classList.remove('active');
         modal.setAttribute('aria-hidden', 'true');
     }
     try {
         const bd = document.querySelector('.sa-modal-backdrop[data-modal-id="reevaluateModal"]');
         if (bd && bd.parentNode) bd.parentNode.removeChild(bd);
-    } catch (_) {}
+    } catch (_) { if (typeof logError === "function") logError(_); }
     const reviewCard = document.getElementById('reviewCard');
     if (reviewCard) { reviewCard.classList.add('active'); reviewCard.style.display = 'block'; }
 }
@@ -1005,12 +1005,12 @@ function startReevaluation() {
     if (index !== -1) currentTraitIndex = index;
 
     // Hide modal and review card, then show evaluation
-    try { if (window.ModalController) window.ModalController.closeById('reevaluateModal'); } catch (_) {}
-    if (window.A11y) try { A11y.closeDialog(modal); } catch (_) {}
+    try { if (window.ModalController) window.ModalController.closeById('reevaluateModal'); } catch (_) { if (typeof logError === "function") logError(_); }
+    if (window.A11y) try { A11y.closeDialog(modal); } catch (_) { if (typeof logError === "function") logError(_); }
     modal.classList.remove('active');
     modal.setAttribute('aria-hidden', 'true');
-    try { modal.style.display = 'none'; } catch (_) {}
-    try { document.querySelectorAll('.sa-modal-backdrop[data-modal-id="reevaluateModal"]').forEach(b => { if (b && b.parentNode) b.parentNode.removeChild(b); }); } catch (_) {}
+    try { modal.style.display = 'none'; } catch (_) { if (typeof logError === "function") logError(_); }
+    try { document.querySelectorAll('.sa-modal-backdrop[data-modal-id="reevaluateModal"]').forEach(b => { if (b && b.parentNode) b.parentNode.removeChild(b); }); } catch (_) { if (typeof logError === "function") logError(_); }
     isInReviewMode = false;
     const reviewCard = document.getElementById('reviewCard');
     if (reviewCard) {
@@ -1048,13 +1048,13 @@ function goBackToLastTrait() {
 // proceedToDirectedComments()
 function proceedToDirectedComments() {
     isInReviewMode = false;
-    try { if (window.ModalController) window.ModalController.closeAll(); } catch (_) {}
+    try { if (window.ModalController) window.ModalController.closeAll(); } catch (_) { if (typeof logError === "function") logError(_); }
     try {
         document.querySelectorAll('.evaluation-card, .review-card, .section-i-generation-card, .summary-card').forEach(card => {
             card.classList.remove('active');
             card.style.display = 'none';
         });
-    } catch (_) {}
+    } catch (_) { if (typeof logError === "function") logError(_); }
     const progressEl = document.getElementById('progressText');
     if (progressEl) progressEl.textContent = 'Directed Comments Selection';
     const dcCard = document.getElementById('directedCommentsCard');
@@ -1066,7 +1066,7 @@ function proceedToDirectedComments() {
             renderDirectedCommentsGrid();
         }
     } catch (_) { /* ignore */ }
-    try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (_) {}
+    try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (_) { if (typeof logError === "function") logError(_); }
 }
 
 function showSummary() {

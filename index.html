@@ -23,6 +23,8 @@
     <!-- Explicit favicon to avoid default /favicon.ico 404 -->
     <link rel="icon" type="image/png" href="assets/images/Logo.png">
     <link rel="shortcut icon" href="assets/images/Logo.png">
+    <!-- Central error sink loads first so empty-catch replacements can log. -->
+    <script src="js/logError.js"></script>
     <!-- PoC config loads first to install network and storage guards -->
     <script src="js/config.js"></script>
     <!-- PoC banner script gates user interaction behind a forced acknowledgment -->
