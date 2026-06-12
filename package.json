@@ -5,6 +5,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "test": "node tests/run-tests.js",
     "lint": "eslint .",
     "docs:coverage": "node scripts/jsdoc-coverage.js"
   },
