@@ -270,25 +270,6 @@ function updateRSSetupDisplay() {
 
     // PoC: profile hydration from storage removed. localStorage is prohibited.
     // If currentProfile is not set in-memory, hasProfile stays false.
-    if (!hasProfile) {
-        try {
-            // Stub block, retained only so surrounding flow keeps its shape.
-            if (false) {
-                const stored = null;
-                if (stored && stored.rsName) {
-                    window.currentProfile = {
-                        rsName: stored.rsName,
-                        rsEmail: stored.rsEmail,
-                        rsRank: stored.rsRank,
-                        totalEvaluations: (stored.evaluations || []).length,
-                        lastUpdated: stored.lastUpdated || new Date().toISOString()
-                    };
-                    profile = window.currentProfile;
-                    hasProfile = true;
-                }
-            }
-        } catch (_) {}
-    }
 
     if (hasProfile) {
         // Prefill inputs with profile data; lock inputs to match profile header
