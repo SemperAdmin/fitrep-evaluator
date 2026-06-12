@@ -144,16 +144,16 @@
             </div>
             
             <div class="form-group">
-                <label class="form-label">Evaluation Period:</label>
+                <label class="form-label" for="fromDateInput">Evaluation Period:</label>
                 <div class="date-inputs">
-                    <input type="date" class="form-input" id="fromDateInput" required aria-required="true">
-                    <input type="date" class="form-input" id="toDateInput" required aria-required="true">
+                    <input type="date" class="form-input" id="fromDateInput" required aria-required="true" aria-label="Evaluation period start date">
+                    <input type="date" class="form-input" id="toDateInput" required aria-required="true" aria-label="Evaluation period end date">
                 </div>
             </div>
 
             <!-- Occasion Type Selection -->
             <div class="form-group">
-                <label class="form-label">
+                <label class="form-label" for="evaluationOccasionSetup">
                     Occasion Type:
                     <button type="button" class="info-icon" onclick="showTooltip(event, 'occasion-setup-tooltip')" onmouseenter="showTooltip(event, 'occasion-setup-tooltip')" onmouseleave="hideTooltip('occasion-setup-tooltip')" onfocus="showTooltip(event, 'occasion-setup-tooltip')" onblur="hideTooltip('occasion-setup-tooltip')" title="What does Occasion mean?" aria-label="Show occasion info"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></button>
                 </label>
