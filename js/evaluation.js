@@ -122,18 +122,22 @@ function getSectionInfo(sectionKey) {
     return sectionDetails[sectionKey] || { description: "", importance: "" };
 }
 
+// MCO 1610.7B anchors each attribute's PARS at B, D, and F only. C and E are
+// intermediate boxes with NO descriptive text in the order; whether a mark is
+// "average" is each RS's individual marking philosophy, so no evaluative
+// wording is invented here. (docs/MCO_1610.7B.md:3056-3065, 3187-3214)
+const GRADE_SCALE_LABELS = {
+    A: 'Unacceptable performance. An "A" mark is adverse and requires written justification',
+    B: 'Meets the standard in this attribute\'s "B" word picture',
+    C: 'Exceeds the "B" standard but does not meet the "D" standard (the order defines no word picture for "C")',
+    D: 'Meets the standard in this attribute\'s "D" word picture',
+    E: 'Exceeds the "D" standard but does not meet the "F" standard (the order defines no word picture for "E")',
+    F: 'Meets the standard in this attribute\'s "F" word picture',
+    G: 'Surpasses the "F" standard; a truly extraordinary level of performance rarely observed. Requires significant written justification'
+};
+
 function getGradeMeaning(grade) {
-    const meanings = {
-        'A': "Significantly below standards",
-        'B': "Meets requirements and expectations", 
-        'C': "Below average but acceptable",
-        'D': "Consistently produces quality results",
-        'E': "Above average performance",
-        'F': "Results far surpass expectations",
-        'G': "Exceptional, setting new standards"
-    };
-    
-    return meanings[grade] || "";
+    return GRADE_SCALE_LABELS[grade] || '';
 }
 
 function getRemainingsSections() {
@@ -213,6 +217,15 @@ function startEvaluation() {
         return;
     }
 
+    // Rank/occasion rules per MCO 1610.7B ch.3 (docs/MCO_1610.7B.md:1185-1220,1454-1461,1508-1511)
+    try {
+        const fvc = global.FormValidationCore;
+        if (fvc && typeof fvc.validateRankOccasion === 'function') {
+            const ruleCheck = fvc.validateRankOccasion(marineRank, occasionType);
+            if (!ruleCheck.valid) { alert(ruleCheck.message); return; }
+        }
+    } catch (_) { if (typeof logError === 'function') logError(_); }
+
     // Update evaluationMeta properties instead of reassigning to preserve object reference
     // Clear existing properties first
     for (const key in evaluationMeta) {
@@ -258,6 +271,36 @@ function startEvaluation() {
     
     updateProgress();
     renderCurrentTrait();
+}
+
+/**
+ * Live UX: disable occasion <option>s not allowed for the selected rank
+ * per MCO 1610.7B ch. 3. Rank empty/unknown => allowed null => all enabled.
+ * If the current selection becomes disabled, reset it and warn the user.
+ */
+function syncOccasionAvailability() {
+    try {
+        const rankEl = document.getElementById('marineRankSelect');
+        const occEl = document.getElementById('evaluationOccasionSetup');
+        if (!occEl) return;
+        const rank = rankEl ? rankEl.value : '';
+        const fvc = global.FormValidationCore;
+        const allowed = fvc && typeof fvc.getAllowedOccasions === 'function'
+            ? fvc.getAllowedOccasions(rank)
+            : null;
+        const prevValue = occEl.value;
+        for (const opt of occEl.options) {
+            if (opt.value === '') continue;
+            opt.disabled = allowed ? allowed.indexOf(opt.value) === -1 : false;
+        }
+        if (prevValue && allowed && allowed.indexOf(prevValue) === -1) {
+            occEl.value = '';
+            const check = fvc && typeof fvc.validateRankOccasion === 'function'
+                ? fvc.validateRankOccasion(rank, prevValue)
+                : null;
+            if (check && check.message) showToast(check.message, 'warning');
+        }
+    } catch (_) { if (typeof logError === 'function') logError(_); }
 }
 
 function initializeTraits() {
@@ -801,6 +844,17 @@ function populateReviewScreen() {
     // Render
     reviewGrid.innerHTML = '';
 
+    // Recompute adverse designation from current state on every render so the
+    // banner self-clears when an 'A' is regraded (no stored flag).
+    try {
+        const notice = document.getElementById('adverseNoticeReview');
+        if (notice && typeof getAdverseFindings === 'function') {
+            const f = getAdverseFindings();
+            notice.hidden = !f.isAdverse;
+            notice.textContent = f.isAdverse ? buildAdverseNoticeText(f) : '';
+        }
+    } catch (_) { if (typeof logError === 'function') logError(_); }
+
     const sections = Object.keys(sectionGroups);
     if (sections.length === 0) {
         reviewGrid.innerHTML = `
@@ -821,9 +875,10 @@ function populateReviewScreen() {
             const safeTraitName = escapeHtml(trait.trait);
             const safeGradeDesc = escapeHtml(gradeDescription);
             const safeJustification = fullText ? nl2br(fullText) : '<em>No justification provided</em>';
+            const adverseClass = (trait.grade === 'A') ? ' review-trait-item--adverse' : '';
 
-             return ` 
-                 <div class="review-trait-item" id="review-item-${trait.key}"> 
+             return `
+                 <div class="review-trait-item${adverseClass}" id="review-item-${trait.key}">
                      <div class="review-trait-header"> 
                          <div class="review-trait-name">${safeTraitName}</div> 
                      </div> 
@@ -854,16 +909,7 @@ function populateReviewScreen() {
 }
 
 function getGradeDescription(grade) {
-    const descriptions = {
-        'A': "Significantly below standards",
-        'B': "Meets requirements and expectations", 
-        'C': "Below average but acceptable",
-        'D': "Consistently produces quality results",
-        'E': "Above average performance",
-        'F': "Results far surpass expectations",
-        'G': "Exceptional, setting new standards"
-    };
-    return descriptions[grade] || "Grade description not available";
+    return GRADE_SCALE_LABELS[grade] || 'Grade description not available';
 }
 
 function editTrait(traitKey) {
@@ -1103,6 +1149,17 @@ function showSummary() {
         <strong>Completed:</strong> ${new Date().toLocaleDateString()}
     `;
 
+    // Recompute adverse designation from current state (now includes any
+    // directed comments selected since the review step).
+    try {
+        const notice = document.getElementById('adverseNoticeSummary');
+        if (notice && typeof getAdverseFindings === 'function') {
+            const f = getAdverseFindings();
+            notice.hidden = !f.isAdverse;
+            notice.textContent = f.isAdverse ? buildAdverseNoticeText(f) : '';
+        }
+    } catch (_) { if (typeof logError === 'function') logError(_); }
+
     const summaryGrid = document.getElementById('summaryGrid');
     summaryGrid.innerHTML = '';
 
@@ -1167,6 +1224,7 @@ function showSummary() {
 // Expose module API and backward-compatible shims
 const EvaluationAPI = {
     startEvaluation,
+    syncOccasionAvailability,
     getSectionProgress,
     getSectionInfo,
     getGradeMeaning,
@@ -1211,6 +1269,7 @@ global.Evaluation = EvaluationAPI;
 
 // Backward-compat for inline event handlers in HTML
 global.startEvaluation = EvaluationAPI.startEvaluation;
+global.syncOccasionAvailability = syncOccasionAvailability;
 global.goBackToLastTrait = EvaluationAPI.goBackToLastTrait;
 global.proceedToDirectedComments = EvaluationAPI.proceedToDirectedComments;
 global.saveJustification = EvaluationAPI.saveJustification;

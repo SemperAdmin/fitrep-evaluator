@@ -620,6 +620,22 @@ body {
     text-align: center;
 }
 
+/* Adverse-report designation. Distinct from .warning-banner because the
+   designation MUST print (warning-banner is hidden in @media print). */
+.adverse-notice {
+    background: #fdecea;
+    border: 2px solid #c62828;
+    color: #7f1d1d;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.review-trait-item--adverse {
+    border-left: 4px solid #c62828;
+}
+
 /* Card Styles */
 .setup-card, 
 .evaluation-card, 
@@ -1346,6 +1362,13 @@ body {
     margin: 20px 0;
     font-size: 24px;
     font-weight: bold;
+}
+
+.fitrep-average-note {
+    text-align: center;
+    margin: -8px 0 20px;
+    font-size: 13px;
+    color: #666;
 }
 
 .summary-grid {
@@ -4012,6 +4035,12 @@ body {
     
     .header, .export-section, .warning-banner {
         display: none !important;
+    }
+
+    /* The adverse designation must remain visible in print; force a high-
+       contrast border for monochrome printers. */
+    .adverse-notice {
+        border: 2px solid #000 !important;
     }
     
     .summary-card {
