@@ -408,16 +408,16 @@ function renderCurrentTrait() {
             </div>
 
             <div class="action-buttons">
-                <button class="btn btn-does-not-meet" onclick="handleGradeAction('does-not-meet')"
+                <button class="btn btn-does-not-meet" data-action="grade-action" data-grade="does-not-meet"
                         ${isAtA ? 'disabled' : ''}>
                     <span class="button-label">Does Not Meet</span>
                     <span class="button-description">Select lower standard</span>
                 </button>
-                <button class="btn btn-meets" onclick="handleGradeAction('meets')">
+                <button class="btn btn-meets" data-action="grade-action" data-grade="meets">
                     <span class="button-label">Meets</span>
                     <span class="button-description">Assign this grade</span>
                 </button>
-                <button class="btn btn-surpasses" onclick="handleGradeAction('surpasses')">
+                <button class="btn btn-surpasses" data-action="grade-action" data-grade="surpasses">
                     <span class="button-label">Surpasses</span>
                     <span class="button-description">Try higher standard</span>
                 </button>
@@ -537,17 +537,16 @@ function renderCompletedTraitsAccordion() {
         // Section as accordion item with ARIA attributes for accessibility
         // Saves state to sessionStorage when toggled
         const contentId = `${sectionId}-content`;
-        const escapedTitle = safeSectionTitle.replace(/'/g, "\\'");
         accordionHTML += `
             <div class="accordion-item">
                 <input type="checkbox" id="${sectionId}" aria-hidden="true" ${checkedAttr}
-                       onchange="this.nextElementSibling.setAttribute('aria-expanded', this.checked); saveAccordionState('${escapedTitle}', this.checked);">
+                       data-action="accordion-toggle" data-accordion-title="${safeSectionTitle}">
                 <label for="${sectionId}" class="accordion-header accordion-section-header"
                        role="button"
                        aria-expanded="${ariaExpanded}"
                        aria-controls="${contentId}"
                        tabindex="0"
-                       onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}">
+                       data-keyactivate>
                     <div class="accordion-header-content">
                         <span class="accordion-section-title">${safeSectionTitle}</span>
                         <span class="accordion-trait-count">${traitCount} trait${traitCount !== 1 ? 's' : ''}</span>
@@ -839,7 +838,7 @@ function populateReviewScreen() {
                          ${safeJustification} 
                      </div> 
                      <div class="button-row" style="margin-top: 10px;"> 
-                         <button class="btn btn-meets" onclick="editTrait('${trait.key}')">Re-evaluate Trait</button> 
+                         <button class="btn btn-meets" data-action="edit-trait" data-trait-key="${trait.key}">Re-evaluate Trait</button>
                      </div> 
                  </div> 
              `; 

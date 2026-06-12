@@ -231,7 +231,7 @@ function updateSelectedCommentsSection() {
             fieldsHTML += `
                 <div>
                     <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #1e3c72;">Select Situation:</label>
-                    <select class="placeholder-input" onchange="updateDynamicComment('${commentKey}', this.value)">
+                    <select class="placeholder-input" data-action="update-dynamic-comment" data-comment-key="${commentKey}">
                         <option value="">Select Situation</option>
                         ${Object.keys(comment.options).map(key => `<option value="${key}">${comment.options[key].label}</option>`).join('')}
                     </select>
@@ -245,7 +245,7 @@ function updateSelectedCommentsSection() {
                     fieldsHTML += `
                         <div>
                             <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #1e3c72;">${field.label}:</label>
-                            <select class="placeholder-input" onchange="updateDirectedCommentData('${commentKey}', '${field.key}', this.value)">
+                            <select class="placeholder-input" data-action="update-directed-comment" data-comment-key="${commentKey}" data-field-key="${field.key}">
                                 <option value="">Select ${field.label}</option>
                                 ${field.options.map(option => `<option value="${option}">${option}</option>`).join('')}
                             </select>
@@ -255,14 +255,14 @@ function updateSelectedCommentsSection() {
                     fieldsHTML += `
                         <div>
                             <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #1e3c72;">${field.label}:</label>
-                            <input type="date" class="placeholder-input" onchange="updateDirectedCommentData('${commentKey}', '${field.key}', this.value)" />
+                            <input type="date" class="placeholder-input" data-action="update-directed-comment" data-comment-key="${commentKey}" data-field-key="${field.key}" />
                         </div>
                     `;
                 } else {
                     fieldsHTML += `
                         <div>
                             <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #1e3c72;">${field.label}:</label>
-                            <input type="text" class="placeholder-input" placeholder="${field.placeholder}" oninput="updateDirectedCommentData('${commentKey}', '${field.key}', this.value)" />
+                            <input type="text" class="placeholder-input" placeholder="${field.placeholder}" data-action="update-directed-comment" data-comment-key="${commentKey}" data-field-key="${field.key}" />
                         </div>
                     `;
                 }
@@ -345,7 +345,7 @@ function updateDynamicComment(commentKey, optionKey) {
             fieldsHTML += `
                 <div>
                     <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #1e3c72;">${field.label}:</label>
-                    <input type="${field.type}" class="placeholder-input" placeholder="${field.placeholder}" oninput="updateDirectedCommentData('${commentKey}', '${field.key}', this.value)" />
+                    <input type="${field.type}" class="placeholder-input" placeholder="${field.placeholder}" data-action="update-directed-comment" data-comment-key="${commentKey}" data-field-key="${field.key}" />
                 </div>
             `;
         });

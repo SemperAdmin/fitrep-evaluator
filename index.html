@@ -40,7 +40,7 @@
         <div class="header">
             <!-- Branding row -->
             <div class="header-branding">
-                <img src="assets/images/Logo.png" alt="Semper Admin Logo" class="header-logo" width="160" height="40" loading="eager" decoding="async" fetchpriority="high" onerror="this.style.display='none'">
+                <img src="assets/images/Logo.png" alt="Semper Admin Logo" class="header-logo" width="160" height="40" loading="eager" decoding="async" fetchpriority="high" data-hide-on-error>
                 <div class="header-titles">
                     <h1>USMC FITNESS REPORT EVALUATOR</h1>
                     <div class="header-subtitle-row">
@@ -52,7 +52,7 @@
 
             <!-- Info row -->
             <div class="header-info">
-                <button type="button" class="header-link header-link--button" id="helpButton" onclick="openHelpModal()" title="How this tool works" aria-label="Open Help: How This Tool Works" aria-controls="helpModal" aria-expanded="false">
+                <button type="button" class="header-link header-link--button" id="helpButton" data-action="open-help" title="How this tool works" aria-label="Open Help: How This Tool Works" aria-controls="helpModal" aria-expanded="false">
                     <svg class="link-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
                         <circle cx="12" cy="12" r="10"/>
                         <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
@@ -68,7 +68,7 @@
                     <span>Marking Philosophy Video</span>
                 </a>
                 <span class="header-divider" aria-hidden="true">&middot;</span>
-                <button type="button" class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Switch to dark mode">
+                <button type="button" class="theme-toggle" id="themeToggle" data-action="toggle-theme" aria-label="Switch to dark mode">
                     <svg class="theme-icon theme-icon--moon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
                         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                     </svg>
@@ -155,7 +155,7 @@
             <div class="form-group">
                 <label class="form-label" for="evaluationOccasionSetup">
                     Occasion Type:
-                    <button type="button" class="info-icon" onclick="showTooltip(event, 'occasion-setup-tooltip')" onmouseenter="showTooltip(event, 'occasion-setup-tooltip')" onmouseleave="hideTooltip('occasion-setup-tooltip')" onfocus="showTooltip(event, 'occasion-setup-tooltip')" onblur="hideTooltip('occasion-setup-tooltip')" title="What does Occasion mean?" aria-label="Show occasion info"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></button>
+                    <button type="button" class="info-icon" data-tooltip="Evaluation Occasion Types per MCO 1610.7B. Grade Change (GC): when Marine is promoted. CMC Directed (DC): special evaluations ordered by CMC. Change of RS (CH): when Reporting Senior changes. Transfer (TR): Marine changes duty station. Change of Duty (CD): new assignment, same unit. To/From Temp Duty (TD/FD): temporary assignments. End of Service (EN): retirement, separation, or EAS. Change in Status (CS): Active to Reserve changes. Annual (AN/AR): regular yearly evaluation. Semiannual (SA): Lieutenants only, twice yearly. Reserve Training (RT): annual training evaluation." data-tooltip-max-width="360" title="What does Occasion mean?" aria-label="Show occasion info"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></button>
                 </label>
                 <select class="setup-select" id="evaluationOccasionSetup" required aria-required="true">
                     <option value="">Select Occasion Type...</option>
@@ -173,20 +173,6 @@
                     <option value="SA">Semiannual (Lieutenants only) - SA</option>
                     <option value="RT">Reserve Training - RT</option>
                 </select>
-                <div class="tooltip-content" id="occasion-setup-tooltip">
-                    <strong>Evaluation Occasion Types per MCO 1610.7B:</strong><br><br>
-                    <strong>Grade Change (GC):</strong> When Marine is promoted<br>
-                    <strong>CMC Directed (DC):</strong> Special evaluations ordered by CMC<br>
-                    <strong>Change of RS (CH):</strong> When Reporting Senior changes<br>
-                    <strong>Transfer (TR):</strong> Marine changes duty station<br>
-                    <strong>Change of Duty (CD):</strong> New assignment, same unit<br>
-                    <strong>To/From Temp Duty (TD/FD):</strong> Temporary assignments<br>
-                    <strong>End of Service (EN):</strong> Retirement, separation, or EAS<br>
-                    <strong>Change in Status (CS):</strong> Active ↔ Reserve changes<br>
-                    <strong>Annual (AN/AR):</strong> Regular yearly evaluation<br>
-                    <strong>Semiannual (SA):</strong> Lieutenants only, twice yearly<br>
-                    <strong>Reserve Training (RT):</strong> Annual training evaluation
-                </div>
             </div>
 
             <div class="form-group">
@@ -235,7 +221,7 @@
                 <div id="rsProfileDisplay" class="form-static" style="display: none;" aria-live="polite"></div>
             </div>
             
-            <button class="btn btn-meets" onclick="startEvaluation()" style="margin-top: 20px; width: 100%;">Begin Evaluation</button>
+            <button class="btn btn-meets" data-action="start-evaluation" style="margin-top: 20px; width: 100%;">Begin Evaluation</button>
         </div>
 
         <!-- How This Works Card -->
@@ -311,7 +297,7 @@
             
             <div class="review-actions">
                 <div class="button-row">
-                    <button class="btn btn-meets" onclick="proceedToDirectedComments()">Continue to Directed Comments</button>
+                    <button class="btn btn-meets" data-action="proceed-directed-comments">Continue to Directed Comments</button>
                 </div>
             </div>
         </div>
@@ -344,10 +330,10 @@
             
             <div style="text-align: center; margin: 30px 0;">
                 <div class="generation-options">
-                    <button class="generation-btn primary" onclick="generateSectionIComment()"><svg class="icon icon--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg><span>Generate Section I Comment</span></button>
-                    <button class="generation-btn" onclick="regenerateWithStyle('comprehensive')"><svg class="icon icon--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg><span>Comprehensive</span></button>
-                    <button class="generation-btn" onclick="regenerateWithStyle('concise')"><svg class="icon icon--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg><span>Concise</span></button>
-                    <button class="generation-btn" onclick="regenerateWithStyle('promotion-focused')"><svg class="icon icon--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg><span>Promotion-Focused</span></button>
+                    <button class="generation-btn primary" data-action="generate-section-i"><svg class="icon icon--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg><span>Generate Section I Comment</span></button>
+                    <button class="generation-btn" data-action="regenerate-style" data-style="comprehensive"><svg class="icon icon--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg><span>Comprehensive</span></button>
+                    <button class="generation-btn" data-action="regenerate-style" data-style="concise"><svg class="icon icon--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg><span>Concise</span></button>
+                    <button class="generation-btn" data-action="regenerate-style" data-style="promotion-focused"><svg class="icon icon--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg><span>Promotion-Focused</span></button>
                 </div>
             </div>
             
@@ -362,7 +348,7 @@
             </div>
             
             <div class="button-row">
-                <button class="btn btn-meets" onclick="finalizeSectionI()">Continue to Summary</button>
+                <button class="btn btn-meets" data-action="finalize-section-i">Continue to Summary</button>
             </div>
         </div>
 
@@ -385,7 +371,7 @@
             </div>
             
             <div class="button-row">
-                <button class="btn btn-meets" onclick="finalizeDirectedComments()">Continue to Section I</button>
+                <button class="btn btn-meets" data-action="finalize-directed-comments">Continue to Section I</button>
             </div>
         </div>
 
@@ -397,9 +383,9 @@
             <div class="summary-grid" id="summaryGrid"></div>
             <div class="export-section">
                 <div class="button-row">
-                    <button class="btn btn-export" onclick="window.print()">Print Summary</button>
+                    <button class="btn btn-export" data-action="print">Print Summary</button>
                     <!-- PoC: View RS Dashboard removed. No persistence is allowed in PoC mode. -->
-                    <button class="btn btn-export" id="startOverBtn" onclick="resetEvaluation()">Start Over</button>
+                    <button class="btn btn-export" id="startOverBtn" data-action="reset-evaluation">Start Over</button>
                 </div>
             </div>
         </div>
@@ -411,7 +397,7 @@
             <div class="sa-modal-content">
                 <div class="sa-modal-header">
                     <h5 id="disclaimer-modal-title" class="sa-modal-title">Disclaimer</h5>
-                    <button type="button" class="sa-close" aria-label="Close" onclick="modalController.closeById('disclaimer-modal')">
+                    <button type="button" class="sa-close" aria-label="Close" data-action="close-modal" data-modal-id="disclaimer-modal">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -422,13 +408,13 @@
                     <hr style="margin: 16px 0; border: none; border-top: 1px solid #ddd;">
                     <p style="font-size: 12px; color: #666;">
                         For complete legal information, view our:
-                        <a href="#" onclick="event.preventDefault(); openLegalDocumentModal('privacy');" style="color: #1976d2; text-decoration: underline;">Privacy Policy</a> •
-                        <a href="#" onclick="event.preventDefault(); openLegalDocumentModal('terms');" style="color: #1976d2; text-decoration: underline;">Terms of Service</a> •
-                        <a href="#" onclick="event.preventDefault(); openLegalDocumentModal('disclaimer');" style="color: #1976d2; text-decoration: underline;">Disclaimer</a>
+                        <a href="#" data-action="open-legal-doc" data-doc="privacy" style="color: #1976d2; text-decoration: underline;">Privacy Policy</a> •
+                        <a href="#" data-action="open-legal-doc" data-doc="terms" style="color: #1976d2; text-decoration: underline;">Terms of Service</a> •
+                        <a href="#" data-action="open-legal-doc" data-doc="disclaimer" style="color: #1976d2; text-decoration: underline;">Disclaimer</a>
                     </p>
                 </div>
                 <div class="sa-modal-footer">
-                    <button type="button" class="btn btn-primary" onclick="modalController.closeById('disclaimer-modal')">Acknowledge</button>
+                    <button type="button" class="btn btn-primary" data-action="close-modal" data-modal-id="disclaimer-modal">Acknowledge</button>
                 </div>
             </div>
         </div>
@@ -453,8 +439,8 @@
             </div>
             
             <div class="justification-buttons">
-                <button class="btn btn-cancel" onclick="cancelJustification()" aria-label="Cancel justification">Cancel</button>
-                <button class="btn btn-save" onclick="saveJustification()" aria-label="Save justification and continue">Save & Continue</button>
+                <button class="btn btn-cancel" data-action="cancel-justification" aria-label="Cancel justification">Cancel</button>
+                <button class="btn btn-save" data-action="save-justification" aria-label="Save justification and continue">Save & Continue</button>
             </div>
         </div>
     </div>
@@ -480,8 +466,8 @@
                 <h4>Choose an option:</h4>
                 <p>You can keep the current evaluation or start the trait evaluation process over.</p>
                 <div class="reevaluate-buttons">
-                    <button class="btn btn-secondary" onclick="cancelReevaluation()" aria-label="Keep current evaluation">Keep Current</button>
-                    <button class="btn btn-meets" onclick="startReevaluation()" aria-label="Start re-evaluation">Re-evaluate Trait</button>
+                    <button class="btn btn-secondary" data-action="cancel-reevaluation" aria-label="Keep current evaluation">Keep Current</button>
+                    <button class="btn btn-meets" data-action="start-reevaluation" aria-label="Start re-evaluation">Re-evaluate Trait</button>
                 </div>
             </div>
         </div>
@@ -497,7 +483,7 @@
     <!-- Help Modal -->
     <div class="help-modal" id="helpModal" aria-labelledby="helpModalTitle" aria-describedby="helpModalDesc" aria-hidden="true">
         <div class="help-content">
-            <button class="help-close" onclick="closeHelpModal()" aria-label="Close help">&times;</button>
+            <button class="help-close" data-action="close-help" aria-label="Close help">&times;</button>
             
             <div id="helpModalTitle" class="setup-title" style="text-align: center; margin-bottom: 25px;">How This Tool Works</div>
             <p id="helpModalDesc" class="sr-only">Information about unbiased evaluation philosophy and tool usage.</p>
@@ -565,7 +551,7 @@
         <p class="profile-description">This tool demonstrates the left-to-right marking methodology against synthetic Marines only.</p>
 
         <div class="mode-options">
-            <button class="mode-option-btn" onclick="startStandaloneMode()">
+            <button class="mode-option-btn" data-action="start-standalone">
                 <div class="mode-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
                 <div class="mode-title">Begin Methodology Walkthrough</div>
                 <div class="mode-description">Run a single evaluation against a synthetic persona. No data is saved.</div>
@@ -609,6 +595,8 @@
     <script src="js/navigation.js"></script>
     <script src="js/evaluation.js"></script>
     <script src="js/app.js"></script>
+    <!-- Centralized delegated event wiring loads LAST so all global handlers exist. -->
+    <script src="js/eventWiring.js"></script>
 
     <!-- PoC: saveProfileModal, editProfileModal, pendingSyncModal removed under Phase 1. No persistence, no sync, no profile editing. -->
     <!-- PoC: feedback.js script reference removed. External transmission paths are prohibited. -->

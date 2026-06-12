@@ -105,11 +105,11 @@
       modal.setAttribute('aria-labelledby', `legal-modal-title-${docKey}`);
 
       const html = `
-        <div class="legal-modal-overlay" onclick="closeLegalDocumentModal('${docKey}')">
-          <div class="legal-modal-content" onclick="event.stopPropagation()">
+        <div class="legal-modal-overlay" data-legal-overlay="${docKey}">
+          <div class="legal-modal-content">
             <div class="legal-modal-header">
               <h2 id="legal-modal-title-${docKey}" class="legal-modal-title">${docConfig.title}</h2>
-              <button type="button" class="legal-modal-close" aria-label="Close" onclick="closeLegalDocumentModal('${docKey}')">
+              <button type="button" class="legal-modal-close" aria-label="Close" data-action="close-legal-doc" data-doc="${docKey}">
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
@@ -117,7 +117,7 @@
               <p style="color: #999; text-align: center; padding: 20px;">Loading document...</p>
             </div>
             <div class="legal-modal-footer">
-              <button type="button" class="btn btn-primary" onclick="closeLegalDocumentModal('${docKey}')">Close</button>
+              <button type="button" class="btn btn-primary" data-action="close-legal-doc" data-doc="${docKey}">Close</button>
             </div>
           </div>
         </div>
@@ -411,9 +411,9 @@ For questions, contact the originating command in PoC-CHARTER.md.`
               <div class="tos-links" style="margin: 12px 0; padding: 12px; background: #f0f7ff; border-left: 3px solid #2196F3; border-radius: 2px;">
                 <p style="margin: 0 0 8px 0; font-size: 12px;">
                   View full documents:
-                  <a href="#" class="legal-link-inline" data-doc="terms" onclick="event.preventDefault(); openLegalDocumentModal('terms');">Terms of Service</a> &nbsp;·&nbsp;
-                  <a href="#" class="legal-link-inline" data-doc="privacy" onclick="event.preventDefault(); openLegalDocumentModal('privacy');">Privacy Policy</a> &nbsp;·&nbsp;
-                  <a href="#" class="legal-link-inline" data-doc="disclaimer" onclick="event.preventDefault(); openLegalDocumentModal('disclaimer');">Disclaimer</a>
+                  <a href="#" class="legal-link-inline" data-action="open-legal-doc" data-doc="terms">Terms of Service</a> &nbsp;·&nbsp;
+                  <a href="#" class="legal-link-inline" data-action="open-legal-doc" data-doc="privacy">Privacy Policy</a> &nbsp;·&nbsp;
+                  <a href="#" class="legal-link-inline" data-action="open-legal-doc" data-doc="disclaimer">Disclaimer</a>
                 </p>
               </div>
             </div>
