@@ -127,10 +127,10 @@
 
   // Non-lieutenants (Sgt–Col except 2ndLt/1stLt): SA is lieutenants-only
   // (md:1219,1508-1511) and AN is allowed; SA is excluded.
-  const NOT_LT = ALL_OCCASIONS.filter(c => c !== 'SA');
+  const NOT_LT = Object.freeze(ALL_OCCASIONS.filter(c => c !== 'SA'));
 
   // Lieutenants (2ndLt/1stLt): SA allowed, AN excluded (md:1460-1461).
-  const LT = ALL_OCCASIONS.filter(c => c !== 'AN');
+  const LT = Object.freeze(ALL_OCCASIONS.filter(c => c !== 'AN'));
 
   // Allowed occasion codes per #marineRankSelect option value.
   // Sgt–Col use NOT_LT, lieutenants use LT. General officer rows are

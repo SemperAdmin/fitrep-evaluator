@@ -118,6 +118,9 @@
 
   document.addEventListener('keydown', function (e) {
     if (e.key !== 'Enter' && e.key !== ' ') return;
+    // Never hijack keys typed into form controls (e.g. Space in a text field).
+    var tag = e.target && e.target.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
     var el = e.target && e.target.closest ? e.target.closest('[data-keyactivate]') : null;
     if (!el) return;
     e.preventDefault();

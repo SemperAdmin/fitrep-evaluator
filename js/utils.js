@@ -130,7 +130,7 @@ function getAdverseFindings() {
         if (typeof evaluationResults === 'object' && evaluationResults) {
             Object.keys(evaluationResults).forEach(key => {
                 const r = evaluationResults[key] || {};
-                if (r.grade === 'A' || r.gradeNumber === 1) {
+                if (r.grade === 'A' || Number(r.gradeNumber) === 1) {
                     const section = String(r.section || '').trim();
                     const trait = String(r.trait || '').trim();
                     aTraits.push(section ? `${section}: ${trait}` : trait);
@@ -447,7 +447,7 @@ const A11y = (function() {
         // Focus management
         modalEl.__lastFocused = document.activeElement;
         const target = focusFirst ? modalEl.querySelector(focusFirst) : getFocusable(modalEl)[0];
-        try { if (target) target.focus(); } catch (_) { if (typeof logError === "function") logError(_); }
+        try { if (target) target.focus(); } catch (_) { /* benign: focus is best-effort */ }
         trapFocus(modalEl);
         announce('Dialog opened');
     }
@@ -457,7 +457,7 @@ const A11y = (function() {
         untrapFocus(modalEl);
         const last = modalEl.__lastFocused;
         modalEl.__lastFocused = null;
-        try { if (last && typeof last.focus === 'function') last.focus(); } catch (_) { if (typeof logError === "function") logError(_); }
+        try { if (last && typeof last.focus === 'function') last.focus(); } catch (_) { /* benign: focus is best-effort */ }
         announce('Dialog closed');
     }
 

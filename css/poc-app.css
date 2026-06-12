@@ -1181,6 +1181,14 @@ body.dark .fitrep-average-note {
   color: var(--color-muted-foreground);
 }
 
+/* Section/trait descriptions: the legacy dark colors live under the dead
+   body.dark-mode class (the theme toggle sets body.dark), so on dark they fell
+   back to the light #666 and read as faint. Restore readable muted contrast. */
+body.dark .section-description,
+body.dark .trait-description {
+  color: var(--color-muted-foreground);
+}
+
 /* Override inline color: #d32f2f (red destructive label) */
 body.dark [style*="color: #d32f2f"],
 body.dark [style*="color:#d32f2f"] {

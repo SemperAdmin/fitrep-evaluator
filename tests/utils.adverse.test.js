@@ -42,6 +42,13 @@ assert(f.aTraits.length === 1 && /Section D: Performance/.test(f.aTraits[0]), 'a
 let exp = global.buildExportText();
 assert(exp.includes('ADVERSE REPORT DESIGNATION'), 'export should contain ADVERSE REPORT DESIGNATION header');
 
+// (1a) gradeNumber stored as a string ('1') still triggers adverse (coercion).
+reset();
+global.evaluationResults = {
+  t1: { section: 'Section D', trait: 'Performance', grade: '', gradeNumber: '1', justification: 'x' }
+};
+assert(global.getAdverseFindings().isAdverse === true, 'string gradeNumber "1" should be adverse');
+
 // (1b) Single 'A' among F/G marks still adverse.
 reset();
 global.evaluationResults = {
