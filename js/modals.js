@@ -154,7 +154,7 @@
       // Modal visuals and semantics
       modal.style.zIndex = String(entry.zIndexModal);
       // Use flex centering for app overlay modals
-      if (modal.classList.contains('justification-modal') || modal.classList.contains('help-modal') || modal.classList.contains('reevaluate-modal')) {
+      if (modal.classList.contains('justification-modal') || modal.classList.contains('help-modal') || modal.classList.contains('reevaluate-modal') || modal.classList.contains('tos-modal-overlay')) {
         modal.style.display = 'flex';
         try {
           modal.style.position = 'fixed';

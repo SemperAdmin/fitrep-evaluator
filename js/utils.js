@@ -106,7 +106,13 @@ function calculateFitrepAverage() {
     return avg.toFixed(2);
 }
 
-function exportToClipboard() {
+/**
+ * Build the plain-text FITREP evaluation summary from current globals.
+ * References evaluationMeta / evaluationResults at call time (kept bare,
+ * matching the rest of utils.js). Output format is intentionally stable.
+ * @returns {string} The full plain-text summary.
+ */
+function buildExportText() {
     const fitrepAverage = calculateFitrepAverage();
     let exportText = "USMC FITREP Evaluation Results\n";
     exportText += "================================\n\n";
@@ -115,7 +121,7 @@ function exportToClipboard() {
     exportText += `Reporting Senior: ${evaluationMeta.evaluatorName}\n`;
     exportText += `Completed: ${new Date().toLocaleDateString()}\n\n`;
     exportText += `FITREP Average: ${fitrepAverage}\n\n`;
-    
+
     exportText += "TRAIT EVALUATIONS:\n";
     exportText += "==================\n";
     Object.keys(evaluationResults).forEach(key => {
@@ -124,22 +130,139 @@ function exportToClipboard() {
         exportText += `Grade: ${result.grade} (Value: ${result.gradeNumber})\n`;
         exportText += `Justification: ${result.justification}\n\n`;
     });
-    
+
     if (evaluationMeta.sectionIComments && evaluationMeta.sectionIComments.trim()) {
         exportText += "SECTION I - NARRATIVE COMMENTS:\n";
         exportText += "===============================\n";
         exportText += `${evaluationMeta.sectionIComments}\n\n`;
     }
-    
+
     if (evaluationMeta.directedComments && evaluationMeta.directedComments.trim()) {
         exportText += "SECTION I - DIRECTED COMMENTS:\n";
         exportText += "==============================\n";
         exportText += `${evaluationMeta.directedComments}\n\n`;
     }
-    
-    navigator.clipboard.writeText(exportText).then(() => {
-        alert('Results copied to clipboard!');
-    });
+
+    return exportText;
+}
+
+/**
+ * Build a filesystem-safe export filename from the evaluation metadata.
+ * Uses marineName / fromDate / toDate (dates are YYYY-MM-DD). Empty
+ * segments are dropped; if all are empty, falls back to a generic name.
+ * @returns {string} A sanitized .txt filename (basename capped ~80 chars).
+ */
+function buildExportFilename() {
+    const meta = (typeof evaluationMeta === 'object' && evaluationMeta) ? evaluationMeta : {};
+    /**
+     * Sanitize a single filename segment to safe characters.
+     * @param {*} v The raw value.
+     * @returns {string} The sanitized segment (may be empty).
+     */
+    function sanitize(v) {
+        return String(v || '').trim().replace(/[^A-Za-z0-9._-]+/g, '_').replace(/^_+|_+$/g, '');
+    }
+    const marine = sanitize(meta.marineName);
+    const from = sanitize(meta.fromDate);
+    const to = sanitize(meta.toDate);
+
+    let basename;
+    if (!marine && !from && !to) {
+        basename = 'FITREP_Evaluation';
+    } else {
+        let parts = 'FITREP';
+        if (marine) parts += '_' + marine;
+        if (from) parts += '_' + from;
+        if (to) parts += '_to_' + to;
+        basename = parts;
+    }
+    if (basename.length > 80) basename = basename.slice(0, 80);
+    return basename + '.txt';
+}
+
+/**
+ * Show a toast if the global helper exists, otherwise fall back to alert().
+ * @param {string} message The message to display.
+ * @param {string} [type] The toast type (success/warning/error/info).
+ * @returns {void}
+ */
+function notifyUser(message, type) {
+    if (typeof window !== 'undefined' && typeof window.showToast === 'function') {
+        window.showToast(message, type);
+    } else {
+        alert(message);
+    }
+}
+
+/**
+ * Download the current evaluation summary as a .txt file. No-op (with a
+ * toast) when there is nothing to export. Uses a Blob + object URL +
+ * temporary anchor; revocation is deferred so Safari does not abort.
+ * @returns {void}
+ */
+function downloadExportFile() {
+    if (Object.keys(evaluationResults).length === 0) {
+        notifyUser('Nothing to export yet', 'warning');
+        return;
+    }
+    try {
+        const text = buildExportText();
+        const blob = new Blob([text], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const name = buildExportFilename();
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = name;
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        // Defer revoke: a synchronous revoke can abort the download in Safari.
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        notifyUser('Download started: ' + name, 'success');
+    } catch (err) {
+        if (typeof logError === 'function') logError(err, 'downloadExportFile');
+        notifyUser('Could not start the download.', 'error');
+    }
+}
+
+/**
+ * Fallback when the clipboard write fails or is unavailable: log, warn the
+ * user, and download a .txt file instead.
+ * @param {*} err The originating error.
+ * @returns {void}
+ */
+function handleClipboardFailure(err) {
+    if (typeof logError === 'function') logError(err, 'exportToClipboard');
+    notifyUser('Clipboard unavailable — downloading a .txt file instead.', 'warning');
+    downloadExportFile();
+}
+
+/**
+ * Copy the current evaluation summary to the clipboard, falling back to a
+ * .txt download if the clipboard API is unavailable or the write fails.
+ * No-op (with a toast) when there is nothing to export.
+ * @returns {void}
+ */
+function exportToClipboard() {
+    if (Object.keys(evaluationResults).length === 0) {
+        notifyUser('Nothing to export yet', 'warning');
+        return;
+    }
+    const text = buildExportText();
+    if (!navigator.clipboard
+        || typeof navigator.clipboard.writeText !== 'function'
+        || (typeof window.isSecureContext === 'boolean' && !window.isSecureContext)) {
+        handleClipboardFailure(new Error('clipboard unavailable'));
+        return;
+    }
+    try {
+        navigator.clipboard.writeText(text)
+            .then(() => notifyUser('Results copied to clipboard!', 'success'))
+            .catch(handleClipboardFailure);
+    } catch (err) {
+        handleClipboardFailure(err);
+    }
 }
 
 function resetEvaluation() {

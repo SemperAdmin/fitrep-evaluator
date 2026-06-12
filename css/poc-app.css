@@ -1857,6 +1857,12 @@ body.dark .container .section-i-textarea {
   .word-count-display,
   .word-count,
   .performance-tier-display,
+  /* Runtime overlays must never appear in printed output */
+  #appErrorBanner,
+  #toastContainer,
+  /* NOTE: #sectionITextarea may clip long narratives in Firefox/Safari print
+     (overflow not expanded on print). Tracked as a print-layout follow-up;
+     not addressed here to avoid changing the current print layout. */
   /* Hide the "Generated Section I Comment" sub-header and its intro paragraph */
   #sectionIGenerationCard > div > h3,
   #sectionIGenerationCard > div > p,
