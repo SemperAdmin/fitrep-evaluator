@@ -167,7 +167,36 @@ function updateProgress() {
 
 // Main Functions
 // startEvaluation()
+/**
+ * Hard consent gate. The ToS overlay is presentational and can be removed from
+ * the console, so enforce acceptance at the point of action. Re-presents the
+ * gate when consent is missing.
+ * @returns {boolean} True when Terms of Service have been accepted.
+ */
+function requireLegalConsent() {
+    let accepted = false;
+    try {
+        accepted = !!(typeof global.getLegalConsentState === 'function'
+            && global.getLegalConsentState().termsAccepted);
+    } catch (_) { accepted = false; }
+    if (!accepted) {
+        try {
+            if (typeof global.alert === 'function') {
+                global.alert('You must accept the Terms of Service before using the evaluator.');
+            }
+        } catch (_) {}
+        // Re-present the gate if the consent module exposes a hook.
+        try {
+            if (typeof global.showTermsOfServiceGate === 'function') {
+                global.showTermsOfServiceGate();
+            }
+        } catch (_) {}
+    }
+    return accepted;
+}
+
 function startEvaluation() {
+    if (!requireLegalConsent()) return;
     const marineName = document.getElementById('marineNameInput').value.trim();
     const fromDate = document.getElementById('fromDateInput').value;
     const toDate = document.getElementById('toDateInput').value;
@@ -631,8 +660,9 @@ function showJustificationModal() {
 }
 
 function saveJustification() {
+    if (!requireLegalConsent()) return;
     const justificationText = document.getElementById('justificationText').value.trim();
-    
+
     if (!justificationText) {
         alert('Please provide justification for this marking before continuing.');
         return;

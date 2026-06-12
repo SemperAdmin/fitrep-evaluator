@@ -486,6 +486,9 @@ For questions, contact the originating command in PoC-CHARTER.md.`
     CONSENT_STATE.acceptanceTimestamp = new Date().toISOString();
     CONSENT_STATE.acceptanceAcknowledged = true;
 
+    // Tear down through ModalController so the focus trap, body lock, and stack
+    // entry are released before the node is removed.
+    try { if (window.ModalController) window.ModalController.closeById('tosModalOverlay'); } catch (_) {}
     const overlay = document.getElementById('tosModalOverlay');
     if (overlay && overlay.parentNode) {
       overlay.parentNode.removeChild(overlay);
@@ -527,6 +530,26 @@ For questions, contact the originating command in PoC-CHARTER.md.`
         el.classList.add('tos-app-hidden');
       });
 
+      // Route the gate through the app modal system so keyboard focus is
+      // trapped within the dialog (Tab cycles, focus starts on the checkbox).
+      try {
+        if (window.ModalController) {
+          window.ModalController.register('tosModalOverlay', {
+            labelledBy: 'tosModalTitle',
+            describedBy: 'tosModalBody',
+            focusFirst: '#tosCheckbox',
+            closeOnBackdrop: false
+          });
+          window.ModalController.openById('tosModalOverlay');
+        } else if (window.A11y && typeof window.A11y.openDialog === 'function') {
+          window.A11y.openDialog(tosModal, {
+            labelledBy: 'tosModalTitle',
+            describedBy: 'tosModalBody',
+            focusFirst: '#tosCheckbox'
+          });
+        }
+      } catch (_) {}
+
       console.log('[legalConsent] Terms of Service acceptance required.');
     }, 100);
 
@@ -540,6 +563,17 @@ For questions, contact the originating command in PoC-CHARTER.md.`
    */
   window.getLegalConsentState = function() {
     return Object.freeze({ ...CONSENT_STATE });
+  };
+
+  /**
+   * Public API: Re-present the Terms of Service gate.
+   * Used by action-level consent guards when consent is missing (e.g. the
+   * overlay was dismissed from the console).
+   */
+  window.showTermsOfServiceGate = function() {
+    if (!CONSENT_STATE.termsAccepted && !document.getElementById('tosModalOverlay')) {
+      initializeLegalConsent();
+    }
   };
 
   /**
