@@ -71,30 +71,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Attach dynamic tooltips for grid headers with title attributes
-    try {
-        const attachGridTooltips = () => {
-            const headers = document.querySelectorAll('#profileGrid thead th[title]');
-            headers.forEach((th) => {
-                const text = th.getAttribute('title') || '';
-                if (!text) return;
-                th.addEventListener('mouseenter', (e) => showDynamicTooltip(e, text));
-                th.addEventListener('mouseleave', () => hideDynamicTooltip());
-                th.addEventListener('focus', (e) => showDynamicTooltip(e, text));
-                th.addEventListener('blur', () => hideDynamicTooltip());
-            });
-        };
-        attachGridTooltips();
-    } catch (_) { if (typeof logError === "function") logError(_); }
-
     // Dev-only dispatch removed; production UI should not expose workflow controls here
 });
 
 // Add Single Evaluation entrypoint used by index.html button
 function startStandaloneMode() {
-    // PoC: no login_source sessionStorage. No profile context.
-    window.currentProfile = null;
-
     const mode = document.getElementById('modeSelectionCard');
     const UI = (window.CONSTANTS && window.CONSTANTS.UI_SETTINGS)
         ? window.CONSTANTS.UI_SETTINGS
@@ -107,8 +88,8 @@ function startStandaloneMode() {
     const setup = document.getElementById('setupCard');
     if (setup) { setup.classList.add(UI.CSS.ACTIVE); setup.style.display = UI.DISPLAY.SHOW; }
 
-    // Ensure RS display/input reflect standalone mode (no profile)
-    try { if (typeof updateRSSetupDisplay === 'function') updateRSSetupDisplay(); } catch (_) { if (typeof logError === "function") logError(_); }
+    // Sync evaluator setup fields
+    try { if (typeof updateEvaluatorSetupDisplay === 'function') updateEvaluatorSetupDisplay(); } catch (_) { if (typeof logError === "function") logError(_); }
 
     // Align navigation state if available
     try {
@@ -118,12 +99,6 @@ function startStandaloneMode() {
     } catch (_) { if (typeof logError === "function") logError(_); }
 
     window.scrollTo({ top: 0, behavior: 'auto' });
-}
-
-// PoC: showRSLoginFirst stub. Login UI removed entirely. Any caller is a stale
-// reference. Function returns without effect.
-function showRSLoginFirst() {
-    console.warn('[poc] showRSLoginFirst invoked but login UI is removed. No-op.');
 }
 
 // --- Global Tooltip Helpers ---
@@ -226,11 +201,6 @@ function hideDynamicTooltip() {
             __tooltipHideTimer = null;
         }
     } catch (_) { if (typeof logError === "function") logError(_); }
-}
-
-// PoC: showProfileLogin stub. Login UI removed.
-function showProfileLogin() {
-    console.warn('[poc] showProfileLogin invoked but login UI is removed. No-op.');
 }
 
 // --- Theme Toggle ---

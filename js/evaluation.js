@@ -226,9 +226,7 @@ function startEvaluation() {
         toDate,
         evaluatorName,
         // New: store occasion in evaluationMeta
-        occasionType,
-        // Track whether this eval was started from RS profile
-        startedFromProfile: !!window.currentProfile
+        occasionType
     });
     
     isReportingSenior = (selection === 'yes');
@@ -1108,14 +1106,11 @@ function showSummary() {
     const summaryGrid = document.getElementById('summaryGrid');
     summaryGrid.innerHTML = '';
 
-    // Toggle summary action buttons based on origin
+    // Ensure the Start Over action is visible on the summary
     try {
-        const rsBtn = document.getElementById('viewRsDashboardBtn');
         const startOverBtn = document.getElementById('startOverBtn');
-        const fromProfile = !!(evaluationMeta && evaluationMeta.startedFromProfile);
-        if (rsBtn) rsBtn.style.display = fromProfile ? '' : 'none';
-        if (startOverBtn) startOverBtn.style.display = fromProfile ? 'none' : '';
-    } catch (_) { /* ignore */ }
+        if (startOverBtn) startOverBtn.style.display = '';
+    } catch (_) { if (typeof logError === "function") logError(_); }
     
     // Add trait evaluations
     Object.keys(evaluationResults).forEach(key => {
