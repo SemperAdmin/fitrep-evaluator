@@ -118,9 +118,11 @@
 
   document.addEventListener('keydown', function (e) {
     if (e.key !== 'Enter' && e.key !== ' ') return;
-    // Never hijack keys typed into form controls (e.g. Space in a text field).
+    // Never hijack keys typed into form controls, and don't shadow the native
+    // Enter/Space activation of nested buttons, links, or editable content.
     var tag = e.target && e.target.tagName;
-    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' ||
+        tag === 'BUTTON' || tag === 'A' || (e.target && e.target.isContentEditable)) return;
     var el = e.target && e.target.closest ? e.target.closest('[data-keyactivate]') : null;
     if (!el) return;
     e.preventDefault();
