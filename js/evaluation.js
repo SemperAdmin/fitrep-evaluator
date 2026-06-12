@@ -844,6 +844,17 @@ function populateReviewScreen() {
     // Render
     reviewGrid.innerHTML = '';
 
+    // Recompute adverse designation from current state on every render so the
+    // banner self-clears when an 'A' is regraded (no stored flag).
+    try {
+        const notice = document.getElementById('adverseNoticeReview');
+        if (notice && typeof getAdverseFindings === 'function') {
+            const f = getAdverseFindings();
+            notice.hidden = !f.isAdverse;
+            notice.textContent = f.isAdverse ? buildAdverseNoticeText(f) : '';
+        }
+    } catch (_) { if (typeof logError === 'function') logError(_); }
+
     const sections = Object.keys(sectionGroups);
     if (sections.length === 0) {
         reviewGrid.innerHTML = `
@@ -864,9 +875,10 @@ function populateReviewScreen() {
             const safeTraitName = escapeHtml(trait.trait);
             const safeGradeDesc = escapeHtml(gradeDescription);
             const safeJustification = fullText ? nl2br(fullText) : '<em>No justification provided</em>';
+            const adverseClass = (trait.grade === 'A') ? ' review-trait-item--adverse' : '';
 
-             return ` 
-                 <div class="review-trait-item" id="review-item-${trait.key}"> 
+             return `
+                 <div class="review-trait-item${adverseClass}" id="review-item-${trait.key}">
                      <div class="review-trait-header"> 
                          <div class="review-trait-name">${safeTraitName}</div> 
                      </div> 
@@ -1136,6 +1148,17 @@ function showSummary() {
         <strong>Reporting Senior:</strong> ${safeEvaluator} | 
         <strong>Completed:</strong> ${new Date().toLocaleDateString()}
     `;
+
+    // Recompute adverse designation from current state (now includes any
+    // directed comments selected since the review step).
+    try {
+        const notice = document.getElementById('adverseNoticeSummary');
+        if (notice && typeof getAdverseFindings === 'function') {
+            const f = getAdverseFindings();
+            notice.hidden = !f.isAdverse;
+            notice.textContent = f.isAdverse ? buildAdverseNoticeText(f) : '';
+        }
+    } catch (_) { if (typeof logError === 'function') logError(_); }
 
     const summaryGrid = document.getElementById('summaryGrid');
     summaryGrid.innerHTML = '';

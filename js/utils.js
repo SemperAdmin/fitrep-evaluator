@@ -102,6 +102,78 @@ function calculateFitrepAverage() {
     return avg.toFixed(2);
 }
 
+// Map of directed-comment keys that render a report adverse to a citation per
+// MCO 1610.7B ch. 5. Keys verified against js/directedComments.js. Low averages,
+// B/C marks, and decline are deliberately NOT triggers (md:5171-5190).
+const ADVERSE_DIRECTED_COMMENT_REASONS = {
+    relief_for_cause: 'Relief for cause (MCO 1610.7B ch. 5)',
+    not_recommended: 'Not recommended for promotion (ch. 5 par. 3a(1)(c))',
+    disciplinary_action: 'Disciplinary action (ch. 5 par. 3a(1)(b))',
+    failed_pft_cft: 'PFT/CFT failure (ch. 5 par. 3a(1)(e))',
+    bcp: 'Assignment to BCP (ch. 5 par. 3a(1)(f))',
+    adverse_material: 'Adverse/derogatory material (ch. 5 par. 3a(1)(a))'
+};
+
+/**
+ * Recompute, from current state, whether this report is adverse per
+ * MCO 1610.7B ch. 5. In-scope triggers: any attribute marked "A" (sections
+ * D-H; md:5169, 5954, 3193-3195) and user-selected adverse directed comments.
+ * Body-composition is adverse only when the failing option is selected
+ * (md:6646). Low averages / B-C marks / decline are NOT triggers (md:5171-5190).
+ * No stored flag — caller recomputes on every render/export.
+ * @returns {{isAdverse: boolean, aTraits: string[], reasons: string[]}}
+ */
+function getAdverseFindings() {
+    const aTraits = [];
+    const reasons = [];
+    try {
+        if (typeof evaluationResults === 'object' && evaluationResults) {
+            Object.keys(evaluationResults).forEach(key => {
+                const r = evaluationResults[key] || {};
+                if (r.grade === 'A' || r.gradeNumber === 1) {
+                    const section = String(r.section || '').trim();
+                    const trait = String(r.trait || '').trim();
+                    aTraits.push(section ? `${section}: ${trait}` : trait);
+                }
+            });
+        }
+        if (typeof selectedDirectedComments !== 'undefined'
+            && Array.isArray(selectedDirectedComments)) {
+            selectedDirectedComments.forEach(key => {
+                if (Object.prototype.hasOwnProperty.call(ADVERSE_DIRECTED_COMMENT_REASONS, key)) {
+                    reasons.push(ADVERSE_DIRECTED_COMMENT_REASONS[key]);
+                } else if (key === 'body_composition') {
+                    const data = (typeof directedCommentsData === 'object' && directedCommentsData)
+                        ? (directedCommentsData[key] || {}) : {};
+                    if (data.selectedOption === 'exceeds_whtr_and_body_fat') {
+                        reasons.push('Body composition failure — exceeds WHtR and body fat standards (ch. 5 par. 3a(1)(f))');
+                    }
+                }
+            });
+        }
+    } catch (_) { if (typeof logError === 'function') logError(_); }
+    return { isAdverse: aTraits.length > 0 || reasons.length > 0, aTraits, reasons };
+}
+
+/**
+ * Build the single plain-text paragraph that designates an adverse report and
+ * states the notification requirement (detect/designate/state only — the MRO
+ * acknowledgment/statement/rebuttal workflow is out of charter).
+ * @param {{isAdverse: boolean, aTraits: string[], reasons: string[]}} findings
+ * @returns {string} The adverse-notice paragraph.
+ */
+function buildAdverseNoticeText(findings) {
+    const f = findings || { aTraits: [], reasons: [] };
+    const aTraits = Array.isArray(f.aTraits) ? f.aTraits : [];
+    const reasons = Array.isArray(f.reasons) ? f.reasons : [];
+    return 'ADVERSE REPORT. One or more conditions render this report adverse per MCO 1610.7B ch. 5. '
+        + (aTraits.length ? 'Attribute(s) marked "A": ' + aTraits.join('; ') + '. ' : '')
+        + (reasons.length ? reasons.join('; ') + '. ' : '')
+        + 'Required: notify the MRO when the report is routed and refer the adverse report to the MRO, '
+        + 'who must be afforded the opportunity to make a statement (ch. 5). A third officer sighter must '
+        + 'sight all adverse reports. Each "A" mark requires specific written justification (ch. 4 par. 7e).';
+}
+
 /**
  * Build the plain-text FITREP evaluation summary from current globals.
  * References evaluationMeta / evaluationResults at call time (kept bare,
@@ -120,6 +192,13 @@ function buildExportText() {
     exportText += "Note: Raw 1-7 average of observed attribute marks (A=1 ... G=7).\n";
     exportText += "This is NOT the relative value; relative value is computed by HQMC\n";
     exportText += "against the Reporting Senior's profile (MCO 1610.7B, ch. 8).\n\n";
+
+    const adverse = getAdverseFindings();
+    if (adverse.isAdverse) {
+        exportText += "ADVERSE REPORT DESIGNATION:\n";
+        exportText += "===========================\n";
+        exportText += buildAdverseNoticeText(adverse) + "\n\n";
+    }
 
     exportText += "TRAIT EVALUATIONS:\n";
     exportText += "==================\n";
@@ -447,6 +526,8 @@ function nl2br(str) {
 try {
     window.escapeHtml = escapeHtml;
     window.nl2br = nl2br;
+    window.getAdverseFindings = getAdverseFindings;
+    window.buildAdverseNoticeText = buildAdverseNoticeText;
     // Global toast helper for user-facing messages across the app
     window.showToast = window.showToast || function(message, type) {
         try {
