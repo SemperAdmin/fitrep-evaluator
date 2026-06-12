@@ -1213,7 +1213,14 @@ body.dark .container .summary-item {
 body.dark .container .summary-trait { color: var(--color-foreground) !important; }
 body.dark .container .summary-grade { color: var(--color-marine-blue-100) !important; }
 body.dark .container .summary-justification { color: var(--color-muted-foreground) !important; }
-body.dark .container .grade-item { border-bottom-color: var(--color-border) !important; }
+/* Grade-item rows are styled as white cards by styles.css:177 (bg #fff,
+   border, shadow); dark mode only overrode the border, leaving light foreground
+   text on a white card. Give them a dark surface. */
+body.dark .container .grade-item {
+  background: var(--color-surface-2) !important;
+  border-color: var(--color-border) !important;
+  border-bottom-color: var(--color-border) !important;
+}
 
 /* Override inline color: #d32f2f (red destructive label) */
 body.dark [style*="color: #d32f2f"],
@@ -1720,6 +1727,32 @@ body.dark .container .validation-panel {
   background: var(--color-surface-2) !important;
   color: var(--color-foreground) !important;
 }
+
+/* Validation insight boxes are hardcoded light (styles.css:1198-1239:
+   #fff / #ffebee / #fff8e1 / #e3f2fd, with #666 recommendation text), so on the
+   dark Section I screen they rendered as cream cards with faint sub-text. Give
+   them dark tinted surfaces, readable muted recommendation text, and lighter
+   accent colors for the message headings. */
+body.dark .container .validation-item {
+  background: var(--color-surface-3) !important;
+  border-left-color: var(--color-border-strong) !important;
+}
+body.dark .container .validation-item.error {
+  background: rgba(244, 67, 54, 0.12) !important;
+  border-left-color: #ef5350 !important;
+}
+body.dark .container .validation-item.warning {
+  background: rgba(255, 152, 0, 0.12) !important;
+  border-left-color: #ffa726 !important;
+}
+body.dark .container .validation-item.info {
+  background: rgba(33, 150, 243, 0.12) !important;
+  border-left-color: #42a5f5 !important;
+}
+body.dark .container .validation-item.error .validation-message { color: #ff8a80 !important; }
+body.dark .container .validation-item.warning .validation-message { color: #ffb74d !important; }
+body.dark .container .validation-item.info .validation-message { color: #90caf9 !important; }
+body.dark .container .validation-recommendation { color: var(--color-muted-foreground) !important; }
 
 .container .validation-panel h3,
 .container .validation-panel h4 {
