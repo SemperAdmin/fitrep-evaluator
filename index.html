@@ -2,10 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- Content Security Policy. frame-ancestors is intentionally omitted: it is
-         ignored inside a <meta> tag and can only be delivered via an HTTP
-         response header, which static GitHub Pages hosting cannot set. -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; object-src 'none'; base-uri 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'">
+    <!-- Content Security Policy. All event handlers are delegated and there are
+         no inline <script> blocks, so script-src needs no 'unsafe-inline'.
+         style-src keeps 'unsafe-inline' for the many inline style attributes.
+         frame-ancestors is omitted: it is ignored in <meta> and needs an HTTP
+         header, which static GitHub Pages hosting cannot set. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; object-src 'none'; base-uri 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>FITREP Evaluator - PoC - Methodology Aid Only</title>
     <!-- Semper Admin token system loads first so all downstream styles inherit the variables. -->
@@ -585,7 +587,6 @@
     <!-- Scripts - PoC mode. Render API config block removed. CDN dependencies removed. -->
     <!-- All modules with cloud, persistence, or external transmission paths are removed. -->
     <!-- Methodology engine modules retained. config.js, syntheticFixture.js, pocBanner.js already loaded in head. -->
-    <script>console.log('[poc] index.html body loaded.');</script>
     <!-- PoC: errorLogger removed. Module had remote fetch and localStorage paths. -->
     <script src="js/constants.js"></script>
     <script src="js/data.js"></script>

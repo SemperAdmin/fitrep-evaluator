@@ -4489,8 +4489,9 @@ body.dark .container {
 
 /* Header */
 body.dark .header {
-    background: rgba(30, 41, 59, 0.95);
+    background: rgba(30, 41, 59, 0.98);
     border: 1px solid #475569;
+    border-bottom: 1px solid #334155;
 }
 
 body.dark .header h1 {
@@ -4602,15 +4603,8 @@ body.dark #progressText {
 }
 
 /* Section titles */
-body.dark .section-title,
-body.dark .trait-subtitle,
 body.dark .setup-title {
     color: #f8fafc;
-}
-
-body.dark .section-description,
-body.dark .trait-description {
-    color: #cbd5e1;
 }
 
 /* Grade display */
@@ -5404,11 +5398,6 @@ body.dark .update-list strong {
 }
 
 /* Additional Dark Mode Fixes */
-body.dark .header {
-    background: rgba(30, 41, 59, 0.98);
-    border-bottom: 1px solid #334155;
-}
-
 body.dark .save-profile-content,
 body.dark .sa-modal-panel {
     background: #1e293b !important;
@@ -5469,11 +5458,6 @@ body.dark .grade-meaning {
 body.dark .evaluation-guidance {
     background: #334155;
     border-left-color: #fbbf24;
-}
-
-/* Ensure guidance question color is readable on the new background */
-body.dark .guidance-question {
-    color: #f1f5f9;
 }
 
 /* Navigation Helper */
