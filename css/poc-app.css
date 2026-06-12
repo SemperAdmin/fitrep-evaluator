@@ -1189,6 +1189,32 @@ body.dark .trait-description {
   color: var(--color-muted-foreground);
 }
 
+/* Light-mode accordion contrast: the trait-count badge and chevron used
+   white-translucent colors meant for the old navy header gradient, leaving
+   them near-invisible on the token-driven tan header. Re-key to tokens so
+   both themes read clearly. */
+.container .accordion-section-title { color: var(--color-foreground); }
+.container .accordion-trait-count {
+  background: var(--color-secondary);
+  color: var(--color-secondary-foreground);
+}
+.container .accordion-icon { color: var(--color-muted-foreground); }
+.container .accordion-item input:checked + .accordion-header .accordion-icon {
+  color: var(--color-foreground);
+}
+
+/* Dark-mode summary cards: the .summary-item family is hardcoded light in
+   styles.css (#f8f9fa / #1e3c72 / #2a5298 / #555) with no dark rule, so the
+   summary grade cards rendered light with faint text on the dark page. */
+body.dark .container .summary-item {
+  background: var(--color-surface-2) !important;
+  border-left-color: var(--color-border-strong) !important;
+}
+body.dark .container .summary-trait { color: var(--color-foreground) !important; }
+body.dark .container .summary-grade { color: var(--color-marine-blue-100) !important; }
+body.dark .container .summary-justification { color: var(--color-muted-foreground) !important; }
+body.dark .container .grade-item { border-bottom-color: var(--color-border) !important; }
+
 /* Override inline color: #d32f2f (red destructive label) */
 body.dark [style*="color: #d32f2f"],
 body.dark [style*="color:#d32f2f"] {

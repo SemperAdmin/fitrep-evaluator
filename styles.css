@@ -5242,14 +5242,8 @@ body.dark .result-box-title {
     white-space: nowrap;
 }
 
-/* Grade description colors matching app theme */
-.accordion-grade-desc.grade-a { background: #fef2f2; color: #dc2626; }
-.accordion-grade-desc.grade-b { background: #fefce8; color: #ca8a04; }
-.accordion-grade-desc.grade-c { background: #fff7ed; color: #ea580c; }
-.accordion-grade-desc.grade-d { background: #f0fdf4; color: #16a34a; }
-.accordion-grade-desc.grade-e { background: #ecfdf5; color: #059669; }
-.accordion-grade-desc.grade-f { background: #eff6ff; color: #2563eb; }
-.accordion-grade-desc.grade-g { background: #faf5ff; color: #9333ea; }
+/* Per-grade accordion colors removed: the grade is no longer shown mid-flow
+   (left-to-right method); the accordion-grade-desc chip is no longer rendered. */
 
 /* Trait justification text */
 .accordion-trait-justification {
