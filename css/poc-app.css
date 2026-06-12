@@ -1176,6 +1176,11 @@ body.dark [style*="color:#666"] {
   color: var(--color-muted-foreground) !important;
 }
 
+/* Raw-average disclaimer note (muted text) in dark theme */
+body.dark .fitrep-average-note {
+  color: var(--color-muted-foreground);
+}
+
 /* Override inline color: #d32f2f (red destructive label) */
 body.dark [style*="color: #d32f2f"],
 body.dark [style*="color:#d32f2f"] {

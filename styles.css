@@ -1348,6 +1348,13 @@ body {
     font-weight: bold;
 }
 
+.fitrep-average-note {
+    text-align: center;
+    margin: -8px 0 20px;
+    font-size: 13px;
+    color: #666;
+}
+
 .summary-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));

@@ -122,18 +122,22 @@ function getSectionInfo(sectionKey) {
     return sectionDetails[sectionKey] || { description: "", importance: "" };
 }
 
+// MCO 1610.7B anchors each attribute's PARS at B, D, and F only. C and E are
+// intermediate boxes with NO descriptive text in the order; whether a mark is
+// "average" is each RS's individual marking philosophy, so no evaluative
+// wording is invented here. (docs/MCO_1610.7B.md:3056-3065, 3187-3214)
+const GRADE_SCALE_LABELS = {
+    A: 'Unacceptable performance. An "A" mark is adverse and requires written justification',
+    B: 'Meets the standard in this attribute\'s "B" word picture',
+    C: 'Exceeds the "B" standard but does not meet the "D" standard (the order defines no word picture for "C")',
+    D: 'Meets the standard in this attribute\'s "D" word picture',
+    E: 'Exceeds the "D" standard but does not meet the "F" standard (the order defines no word picture for "E")',
+    F: 'Meets the standard in this attribute\'s "F" word picture',
+    G: 'Surpasses the "F" standard; a truly extraordinary level of performance rarely observed. Requires significant written justification'
+};
+
 function getGradeMeaning(grade) {
-    const meanings = {
-        'A': "Significantly below standards",
-        'B': "Meets requirements and expectations", 
-        'C': "Below average but acceptable",
-        'D': "Consistently produces quality results",
-        'E': "Above average performance",
-        'F': "Results far surpass expectations",
-        'G': "Exceptional, setting new standards"
-    };
-    
-    return meanings[grade] || "";
+    return GRADE_SCALE_LABELS[grade] || '';
 }
 
 function getRemainingsSections() {
@@ -893,16 +897,7 @@ function populateReviewScreen() {
 }
 
 function getGradeDescription(grade) {
-    const descriptions = {
-        'A': "Significantly below standards",
-        'B': "Meets requirements and expectations", 
-        'C': "Below average but acceptable",
-        'D': "Consistently produces quality results",
-        'E': "Above average performance",
-        'F': "Results far surpass expectations",
-        'G': "Exceptional, setting new standards"
-    };
-    return descriptions[grade] || "Grade description not available";
+    return GRADE_SCALE_LABELS[grade] || 'Grade description not available';
 }
 
 function editTrait(traitKey) {

@@ -156,7 +156,7 @@ const firepData = {
     
     gradeDescriptions: {
         A: {
-            description: "Performance is significantly below standards and requires immediate corrective action. Does not meet basic requirements of the billet.",
+            description: "Unacceptable performance in this attribute. An 'A' mark renders the entire report adverse and must be specifically justified in the section's JUSTIFICATION block.",
             class: "adverse"
         },
         B: {

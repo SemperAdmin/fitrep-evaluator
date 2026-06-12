@@ -31,6 +31,14 @@ function getGradeNumber(grade) {
     return gradeNumbers[grade];
 }
 
+const MIN_OBSERVED_GRADE_VALUE = 1; // A
+const MAX_OBSERVED_GRADE_VALUE = 7; // G
+/** Whether a numeric grade value represents an observed A-G mark (H=0 excluded per md:7568-7577). */
+function isObservedGradeValue(value) {
+    const n = Number(value);
+    return Number.isFinite(n) && n >= MIN_OBSERVED_GRADE_VALUE && n <= MAX_OBSERVED_GRADE_VALUE;
+}
+
 function updateWordCount() {
     const textarea = document.getElementById('justificationText');
     const counter = document.getElementById('wordCount');
@@ -71,36 +79,24 @@ function calculateFitrepAverage() {
     };
 
     const items = Object.values(evaluationResults || {});
-    const getGradeNum = (aliases) => {
+    // Resolve each alias to its observed numeric value, or null when the
+    // attribute is absent or marked non-observed (H/0). Non-observed marks are
+    // excluded from BOTH numerator and denominator per md:7568-7577, so a stray
+    // H no longer depresses the average.
+    const getObservedValue = (aliases) => {
         const found = items.find(t =>
             aliases.some(a => (t.trait || '').trim().toLowerCase() === a.toLowerCase())
         );
-        return found ? (found.gradeNumber || 0) : 0;
+        if (!found) return null; // attribute not present (e.g. no Section H)
+        return isObservedGradeValue(found.gradeNumber) ? Number(found.gradeNumber) : null;
     };
 
-    const total =
-        getGradeNum(traitAliases['Perf']) +
-        getGradeNum(traitAliases['Prof']) +
-        getGradeNum(traitAliases['Courage']) +
-        getGradeNum(traitAliases['Stress']) +
-        getGradeNum(traitAliases['Initiative']) +
-        getGradeNum(traitAliases['Leading']) +
-        getGradeNum(traitAliases['Develop']) +
-        getGradeNum(traitAliases['Set Exp']) +
-        getGradeNum(traitAliases['Well Being']) +
-        getGradeNum(traitAliases['Comm Skill']) +
-        getGradeNum(traitAliases['PME']) +
-        getGradeNum(traitAliases['Decision']) +
-        getGradeNum(traitAliases['Judgement']) +
-        getGradeNum(traitAliases['Evals']);
+    const observedValues = Object.keys(traitAliases)
+        .map(key => getObservedValue(traitAliases[key]))
+        .filter(value => value !== null);
 
-    const hasSectionH =
-        items.some(t =>
-            (t.trait || '').trim().toLowerCase() === 'evaluations' ||
-            (t.section || '').trim().toLowerCase() === 'fulfillment of evaluation responsibilities'
-        );
-
-    const denom = hasSectionH ? 14 : 13;
+    const denom = observedValues.length;
+    const total = observedValues.reduce((sum, value) => sum + value, 0);
     const avg = denom > 0 ? (total / denom) : 0;
 
     return avg.toFixed(2);
@@ -120,7 +116,10 @@ function buildExportText() {
     exportText += `Period: ${evaluationMeta.fromDate} to ${evaluationMeta.toDate}\n`;
     exportText += `Reporting Senior: ${evaluationMeta.evaluatorName}\n`;
     exportText += `Completed: ${new Date().toLocaleDateString()}\n\n`;
-    exportText += `FITREP Average: ${fitrepAverage}\n\n`;
+    exportText += "FITREP Average: " + fitrepAverage + "\n";
+    exportText += "Note: Raw 1-7 average of observed attribute marks (A=1 ... G=7).\n";
+    exportText += "This is NOT the relative value; relative value is computed by HQMC\n";
+    exportText += "against the Reporting Senior's profile (MCO 1610.7B, ch. 8).\n\n";
 
     exportText += "TRAIT EVALUATIONS:\n";
     exportText += "==================\n";
