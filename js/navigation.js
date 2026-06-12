@@ -3,7 +3,7 @@
 let navigationHistory = (typeof window !== 'undefined' && Array.isArray(window.navigationHistory)) 
     ? window.navigationHistory 
     : [];
-try { if (typeof window !== 'undefined') { window.navigationHistory = navigationHistory; } } catch (_) {}
+try { if (typeof window !== 'undefined') { window.navigationHistory = navigationHistory; } } catch (_) { if (typeof logError === "function") logError(_); }
 let currentStep = 'setup';
 
 const STEPS = {
@@ -29,7 +29,7 @@ function updateNavigationState(step) {
     navigationHistory.push(step);
     try {
         history.pushState({ step }, '', '#' + step);
-    } catch (_) {}
+    } catch (_) { if (typeof logError === "function") logError(_); }
 
     // Update navigation menu states
     updateNavigationMenu();
@@ -243,180 +243,97 @@ function renderBreadcrumbs() {
 
 // Step Navigation Functions
 function showSetupCard() {
-    try { document.body.classList.remove('home-mode'); } catch (_) {}
+    try { document.body.classList.remove('home-mode'); } catch (_) { if (typeof logError === "function") logError(_); }
     hideAllCards();
     const setupCard = document.getElementById('setupCard');
     if (setupCard) {
         setupCard.classList.add(UI.CSS.ACTIVE);
         setupCard.style.display = UI.DISPLAY.SHOW;
-        // Sync RS display/input visibility based on profile context or restored meta
-        if (typeof updateRSSetupDisplay === 'function') {
-            try { updateRSSetupDisplay(); } catch (_) {}
+        // Sync evaluator setup fields from restored evaluation meta
+        if (typeof updateEvaluatorSetupDisplay === 'function') {
+            try { updateEvaluatorSetupDisplay(); } catch (_) { if (typeof logError === "function") logError(_); }
         }
-        try { setupCard.setAttribute('tabindex','-1'); setupCard.focus(); } catch (_) {}
+        try { setupCard.setAttribute('tabindex','-1'); setupCard.focus(); } catch (_) { if (typeof logError === "function") logError(_); }
     }
 }
 
-// Ensure RS name display on setup reflects whether we launched from the RS profile
-function updateRSSetupDisplay() {
-    const rsDisplay = document.getElementById('rsProfileDisplay');
+// Sync the evaluator (Reporting Senior) setup fields from restored evaluation meta.
+function updateEvaluatorSetupDisplay() {
     const evaluatorInput = document.getElementById('evaluatorNameInput');
     const evaluatorRank = document.getElementById('evaluatorRankSelect');
     const combinedInput = document.getElementById('evaluatorCombinedInput');
-    // PoC: rsDashboardBtn and returnToDashboardBtn DOM elements removed. Lookup returns null harmlessly.
-    const returnBtn = null;
-    let profile = window.currentProfile || null;
-    let hasProfile = !!(profile && profile.rsName);
 
-    // PoC: profile hydration from storage removed. localStorage is prohibited.
-    // If currentProfile is not set in-memory, hasProfile stays false.
-
-    if (hasProfile) {
-        // Prefill inputs with profile data; lock inputs to match profile header
-        const headerEl = document.getElementById('profileHeaderName');
-        const headerText = (headerEl && headerEl.textContent ? headerEl.textContent : '').trim();
-        let headerRank = '';
-        let headerName = '';
-        if (headerText) {
-            // Attempt to split rank from name by first space
-            const parts = headerText.split(/\s+/);
-            if (parts.length > 1) {
-                headerRank = parts[0];
-                headerName = parts.slice(1).join(' ');
-            } else {
-                headerName = headerText;
-            }
+    if (evaluatorInput) {
+        const restoredName = (typeof evaluationMeta === 'object' && evaluationMeta && evaluationMeta.evaluatorName) ? evaluationMeta.evaluatorName : '';
+        if (restoredName && !evaluatorInput.value) {
+            evaluatorInput.value = restoredName;
         }
-        const rankValue = profile.rsRank || headerRank || '';
-        const nameValue = profile.rsName || headerName || '';
-
-        if (evaluatorInput) {
-            evaluatorInput.value = nameValue;
-            try { evaluatorInput.disabled = true; } catch (_) {}
-            try { evaluatorInput.readOnly = true; } catch (_) {}
-            try { evaluatorInput.required = true; } catch (_) {}
-            try { evaluatorInput.setAttribute('aria-hidden', 'false'); } catch (_) {}
-            // Keep original hidden; combined input will present the value
-            evaluatorInput.style.display = 'none';
+        evaluatorInput.style.display = 'none';
+        try { evaluatorInput.disabled = true; } catch (_) { if (typeof logError === "function") logError(_); }
+        try { evaluatorInput.readOnly = true; } catch (_) { if (typeof logError === "function") logError(_); }
+        try { evaluatorInput.required = true; } catch (_) { if (typeof logError === "function") logError(_); }
+        try { evaluatorInput.setAttribute('aria-hidden', 'false'); } catch (_) { if (typeof logError === "function") logError(_); }
+    }
+    if (evaluatorRank) {
+        const restoredRank = (typeof evaluationMeta === 'object' && evaluationMeta && evaluationMeta.evaluatorRank) ? evaluationMeta.evaluatorRank : '';
+        if (restoredRank && !evaluatorRank.value) {
+            evaluatorRank.value = restoredRank;
+        } else {
+            evaluatorRank.value = '';
         }
-        if (evaluatorRank) {
-            if (rankValue) evaluatorRank.value = rankValue;
-            try { evaluatorRank.disabled = true; } catch (_) {}
-            try { evaluatorRank.setAttribute('aria-hidden', 'false'); } catch (_) {}
-            evaluatorRank.style.display = 'none';
-        }
-        if (combinedInput) {
-            combinedInput.value = (rankValue ? (rankValue + ' ') : '') + (nameValue || '');
-            try { combinedInput.setAttribute('aria-hidden', 'false'); } catch (_) {}
-        }
-        if (rsDisplay) {
-            rsDisplay.textContent = '';
-            rsDisplay.style.display = UI.DISPLAY.HIDE;
-            try { rsDisplay.setAttribute('aria-hidden', 'true'); } catch (_) {}
-        }
-        if (returnBtn) {
-            // Visible when launched from a profile
-            try { returnBtn.style.setProperty('display', UI.DISPLAY.SHOW, 'important'); } catch (_) { returnBtn.style.display = UI.DISPLAY.SHOW; }
-            try { returnBtn.setAttribute('aria-hidden', 'false'); } catch (_) {}
-        }
-    } else {
-        // No profile: fill combined from meta/header if available; keep originals hidden
-        if (rsDisplay) {
-            rsDisplay.textContent = '';
-            rsDisplay.style.display = UI.DISPLAY.HIDE;
-            try { rsDisplay.setAttribute('aria-hidden', 'true'); } catch (_) {}
-        }
-        if (evaluatorInput) {
-            const restoredName = (typeof evaluationMeta === 'object' && evaluationMeta && evaluationMeta.evaluatorName) ? evaluationMeta.evaluatorName : '';
-            if (restoredName && !evaluatorInput.value) {
-                evaluatorInput.value = restoredName;
-            }
-            evaluatorInput.style.display = 'none';
-            try { evaluatorInput.disabled = true; } catch (_) {}
-            try { evaluatorInput.readOnly = true; } catch (_) {}
-            try { evaluatorInput.required = true; } catch (_) {}
-            try { evaluatorInput.setAttribute('aria-hidden', 'false'); } catch (_) {}
-        }
-        if (evaluatorRank) {
-            const restoredRank = (typeof evaluationMeta === 'object' && evaluationMeta && evaluationMeta.evaluatorRank) ? evaluationMeta.evaluatorRank : '';
-            if (restoredRank && !evaluatorRank.value) {
-                evaluatorRank.value = restoredRank;
-            } else {
-                evaluatorRank.value = '';
-            }
-            evaluatorRank.style.display = 'none';
-            try { evaluatorRank.disabled = true; } catch (_) {}
-            try { evaluatorRank.setAttribute('aria-hidden', 'false'); } catch (_) {}
-        }
-        if (combinedInput) {
-            const headerEl = document.getElementById('profileHeaderName');
-            const headerText = (headerEl && headerEl.textContent ? headerEl.textContent : '').trim();
-            let headerRank = '';
-            let headerName = '';
-            if (headerText) {
-                const parts = headerText.split(/\s+/);
-                if (parts.length > 1) {
-                    headerRank = parts[0];
-                    headerName = parts.slice(1).join(' ');
-                } else {
-                    headerName = headerText;
-                }
-            }
-            const restoredRank = (typeof evaluationMeta === 'object' && evaluationMeta && evaluationMeta.evaluatorRank) ? evaluationMeta.evaluatorRank : '';
-            const restoredName = (typeof evaluationMeta === 'object' && evaluationMeta && evaluationMeta.evaluatorName) ? evaluationMeta.evaluatorName : '';
-            const rankValue = restoredRank || headerRank || '';
-            const nameValue = restoredName || headerName || '';
-            combinedInput.value = (rankValue ? (rankValue + ' ') : '') + (nameValue || '');
-            try { combinedInput.setAttribute('aria-hidden', 'false'); } catch (_) {}
-        }
-        if (returnBtn) {
-            try { returnBtn.style.setProperty('display', UI.DISPLAY.HIDE, 'important'); } catch (_) { returnBtn.style.display = UI.DISPLAY.HIDE; }
-            try { returnBtn.setAttribute('aria-hidden', 'true'); } catch (_) {}
-        }
+        evaluatorRank.style.display = 'none';
+        try { evaluatorRank.disabled = true; } catch (_) { if (typeof logError === "function") logError(_); }
+        try { evaluatorRank.setAttribute('aria-hidden', 'false'); } catch (_) { if (typeof logError === "function") logError(_); }
+    }
+    if (combinedInput) {
+        const restoredRank = (typeof evaluationMeta === 'object' && evaluationMeta && evaluationMeta.evaluatorRank) ? evaluationMeta.evaluatorRank : '';
+        const restoredName = (typeof evaluationMeta === 'object' && evaluationMeta && evaluationMeta.evaluatorName) ? evaluationMeta.evaluatorName : '';
+        combinedInput.value = (restoredRank ? (restoredRank + ' ') : '') + (restoredName || '');
+        try { combinedInput.setAttribute('aria-hidden', 'false'); } catch (_) { if (typeof logError === "function") logError(_); }
     }
 }
 
 function showEvaluationStep() {
-    try { document.body.classList.remove('home-mode'); } catch (_) {}
+    try { document.body.classList.remove('home-mode'); } catch (_) { if (typeof logError === "function") logError(_); }
     hideAllCards();
     const container = document.getElementById('evaluationContainer');
     if (container) {
         container.style.display = UI.DISPLAY.SHOW;
         renderCurrentTrait();
-        try { container.setAttribute('tabindex','-1'); container.focus(); } catch (_) {}
+        try { container.setAttribute('tabindex','-1'); container.focus(); } catch (_) { if (typeof logError === "function") logError(_); }
     }
 }
 
 function showDirectedCommentsStep() {
-    try { document.body.classList.remove('home-mode'); } catch (_) {}
+    try { document.body.classList.remove('home-mode'); } catch (_) { if (typeof logError === "function") logError(_); }
     hideAllCards();
     const card = document.getElementById('directedCommentsCard');
     if (card) {
         card.classList.add(UI.CSS.ACTIVE);
         card.style.display = UI.DISPLAY.SHOW;
-        try { card.setAttribute('tabindex','-1'); card.focus(); } catch (_) {}
+        try { card.setAttribute('tabindex','-1'); card.focus(); } catch (_) { if (typeof logError === "function") logError(_); }
     }
 }
 
 function showSectionIStep() {
-    try { document.body.classList.remove('home-mode'); } catch (_) {}
+    try { document.body.classList.remove('home-mode'); } catch (_) { if (typeof logError === "function") logError(_); }
     hideAllCards();
     const card = document.getElementById('sectionIGenerationCard');
     if (card) {
         card.classList.add(UI.CSS.ACTIVE);
         card.style.display = UI.DISPLAY.SHOW;
-        try { card.setAttribute('tabindex','-1'); card.focus(); } catch (_) {}
+        try { card.setAttribute('tabindex','-1'); card.focus(); } catch (_) { if (typeof logError === "function") logError(_); }
     }
 }
 
 function showSummaryStep() {
-    try { document.body.classList.remove('home-mode'); } catch (_) {}
+    try { document.body.classList.remove('home-mode'); } catch (_) { if (typeof logError === "function") logError(_); }
     hideAllCards();
     const card = document.getElementById('summaryCard');
     if (card) {
         card.classList.add(UI.CSS.ACTIVE);
         card.style.display = UI.DISPLAY.SHOW;
-        try { card.setAttribute('tabindex','-1'); card.focus(); } catch (_) {}
+        try { card.setAttribute('tabindex','-1'); card.focus(); } catch (_) { if (typeof logError === "function") logError(_); }
     }
 }
 

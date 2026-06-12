@@ -45,7 +45,7 @@
         const state = window.FormStore.store.getState();
         return window.FormCore.selectors.isDirty(state);
       }
-    } catch (_) {}
+    } catch (_) { if (typeof logError === "function") logError(_); }
     return dirty;
   }
 
@@ -62,7 +62,7 @@
       if (window.FormNav && typeof window.FormNav.confirmLeave === 'function') {
         return window.FormNav.confirmLeave();
       }
-    } catch (_) {}
+    } catch (_) { if (typeof logError === "function") logError(_); }
     if (hasUnsavedChanges()) {
       return window.confirm('You have unsaved changes. Navigate anyway?');
     }
@@ -80,7 +80,7 @@
         const b = document.getElementById(bId);
         if (a) { a.style.display = DISPLAY.BLOCK; a.classList.add(CSS.ACTIVE); }
         if (b) { b.style.display = DISPLAY.NONE; b.classList.remove(CSS.ACTIVE); }
-      } catch (_) {}
+      } catch (_) { if (typeof logError === "function") logError(_); }
     }
   };
 })();

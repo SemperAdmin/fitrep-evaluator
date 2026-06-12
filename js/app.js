@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Initialize persistence and enhanced auto-save
-    try { if (typeof initializePersistence === 'function') initializePersistence(); } catch (_) {}
+    try { if (typeof initializePersistence === 'function') initializePersistence(); } catch (_) { if (typeof logError === "function") logError(_); }
 
     const mode = document.getElementById('modeSelectionCard');
     const setup = document.getElementById('setupCard');
@@ -71,30 +71,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Attach dynamic tooltips for grid headers with title attributes
-    try {
-        const attachGridTooltips = () => {
-            const headers = document.querySelectorAll('#profileGrid thead th[title]');
-            headers.forEach((th) => {
-                const text = th.getAttribute('title') || '';
-                if (!text) return;
-                th.addEventListener('mouseenter', (e) => showDynamicTooltip(e, text));
-                th.addEventListener('mouseleave', () => hideDynamicTooltip());
-                th.addEventListener('focus', (e) => showDynamicTooltip(e, text));
-                th.addEventListener('blur', () => hideDynamicTooltip());
-            });
-        };
-        attachGridTooltips();
-    } catch (_) {}
-
     // Dev-only dispatch removed; production UI should not expose workflow controls here
 });
 
 // Add Single Evaluation entrypoint used by index.html button
 function startStandaloneMode() {
-    // PoC: no login_source sessionStorage. No profile context.
-    window.currentProfile = null;
-
     const mode = document.getElementById('modeSelectionCard');
     const UI = (window.CONSTANTS && window.CONSTANTS.UI_SETTINGS)
         ? window.CONSTANTS.UI_SETTINGS
@@ -107,23 +88,17 @@ function startStandaloneMode() {
     const setup = document.getElementById('setupCard');
     if (setup) { setup.classList.add(UI.CSS.ACTIVE); setup.style.display = UI.DISPLAY.SHOW; }
 
-    // Ensure RS display/input reflect standalone mode (no profile)
-    try { if (typeof updateRSSetupDisplay === 'function') updateRSSetupDisplay(); } catch (_) {}
+    // Sync evaluator setup fields
+    try { if (typeof updateEvaluatorSetupDisplay === 'function') updateEvaluatorSetupDisplay(); } catch (_) { if (typeof logError === "function") logError(_); }
 
     // Align navigation state if available
     try {
         if (typeof jumpToStep === 'function' && typeof STEPS !== 'undefined') {
             jumpToStep(STEPS.setup);
         }
-    } catch (_) {}
+    } catch (_) { if (typeof logError === "function") logError(_); }
 
     window.scrollTo({ top: 0, behavior: 'auto' });
-}
-
-// PoC: showRSLoginFirst stub. Login UI removed entirely. Any caller is a stale
-// reference. Function returns without effect.
-function showRSLoginFirst() {
-    console.warn('[poc] showRSLoginFirst invoked but login UI is removed. No-op.');
 }
 
 // --- Global Tooltip Helpers ---
@@ -211,7 +186,7 @@ function showDynamicTooltip(event, text) {
         tip.style.display = 'block';
         if (__tooltipHideTimer) clearTimeout(__tooltipHideTimer);
         __tooltipHideTimer = setTimeout(() => hideDynamicTooltip(), 5000);
-    } catch (_) {}
+    } catch (_) { if (typeof logError === "function") logError(_); }
 }
 
 function hideDynamicTooltip() {
@@ -225,12 +200,7 @@ function hideDynamicTooltip() {
             clearTimeout(__tooltipHideTimer);
             __tooltipHideTimer = null;
         }
-    } catch (_) {}
-}
-
-// PoC: showProfileLogin stub. Login UI removed.
-function showProfileLogin() {
-    console.warn('[poc] showProfileLogin invoked but login UI is removed. No-op.');
+    } catch (_) { if (typeof logError === "function") logError(_); }
 }
 
 // --- Theme Toggle ---
@@ -264,7 +234,7 @@ function updateThemeToggleButton(isDark) {
     if (label) label.textContent = isDark ? 'Light' : 'Dark';
     try {
         toggle.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
-    } catch (_) {}
+    } catch (_) { if (typeof logError === "function") logError(_); }
 }
 
 /**
@@ -280,13 +250,13 @@ try {
         window.toggleTheme = toggleTheme;
         window.initializeTheme = initializeTheme;
     }
-} catch (_) {}
+} catch (_) { if (typeof logError === "function") logError(_); }
 
 try {
-    const apply = () => { try { initializeTheme(); } catch (_) {} };
+    const apply = () => { try { initializeTheme(); } catch (_) { if (typeof logError === "function") logError(_); } };
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', apply);
     } else {
         apply();
     }
-} catch (_) {}
+} catch (_) { if (typeof logError === "function") logError(_); }

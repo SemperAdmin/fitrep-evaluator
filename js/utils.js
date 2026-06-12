@@ -193,7 +193,7 @@ const A11y = (function() {
             const el = ensureLiveRegion();
             if (politeness) el.setAttribute('aria-live', politeness);
             el.textContent = String(message || '');
-        } catch (_) {}
+        } catch (_) { if (typeof logError === "function") logError(_); }
     }
 
     function getFocusable(container) {
@@ -246,7 +246,7 @@ const A11y = (function() {
         // Focus management
         modalEl.__lastFocused = document.activeElement;
         const target = focusFirst ? modalEl.querySelector(focusFirst) : getFocusable(modalEl)[0];
-        try { if (target) target.focus(); } catch (_) {}
+        try { if (target) target.focus(); } catch (_) { if (typeof logError === "function") logError(_); }
         trapFocus(modalEl);
         announce('Dialog opened');
     }
@@ -256,14 +256,14 @@ const A11y = (function() {
         untrapFocus(modalEl);
         const last = modalEl.__lastFocused;
         modalEl.__lastFocused = null;
-        try { if (last && typeof last.focus === 'function') last.focus(); } catch (_) {}
+        try { if (last && typeof last.focus === 'function') last.focus(); } catch (_) { if (typeof logError === "function") logError(_); }
         announce('Dialog closed');
     }
 
     return { ensureLiveRegion, announce, openDialog, closeDialog };
 })();
 
-try { window.A11y = A11y; } catch (_) {}
+try { window.A11y = A11y; } catch (_) { if (typeof logError === "function") logError(_); }
 
 function openHelpModal() {
     const modal = document.getElementById('helpModal');
@@ -276,7 +276,7 @@ function openHelpModal() {
             window.ModalController.openById('helpModal');
             return;
         }
-    } catch (_) {}
+    } catch (_) { if (typeof logError === "function") logError(_); }
     // Fallback to previous behavior
     modal.classList.add('active');
     modal.setAttribute('aria-hidden', 'false');
@@ -375,7 +375,7 @@ try {
             setTimeout(() => {
                 el.style.opacity = '0';
                 el.style.transform = 'translateY(10px)';
-                setTimeout(() => { try { el.remove(); } catch (_) {} }, 200);
+                setTimeout(() => { try { el.remove(); } catch (_) { if (typeof logError === "function") logError(_); } }, 200);
             }, 4000);
         } catch (_) { /* ignore */ }
     };

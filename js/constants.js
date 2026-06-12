@@ -11,24 +11,6 @@
    * @typedef {{ ACTIVE: string, ONLINE: string, OFFLINE: string }} CssClasses
    */
   /**
-   * API paths used by the client and server
-   * @typedef {{
-   *   ACCOUNT_CREATE: string,
-   *   ACCOUNT_LOGIN: string,
-   *   ACCOUNT_LOGOUT?: string,
-   *   ACCOUNT_AVAILABLE?: string,
-   *   GITHUB_TOKEN: string,
-   *   SAVE_EVALUATION?: string,
-   *   SAVE_USER_DATA?: string,
-   *   USER_SAVE?: string,
-   *   USER_LOAD?: string,
-   *   EVALUATIONS_LIST?: string,
-   *   EVALUATION_SAVE?: string,
-   *   FEEDBACK?: string,
-   *   ADMIN_BASE?: string
-   * }} ApiPaths
-   */
-  /**
    * Human-facing status messages shown in the UI
    * @typedef {{ ONLINE: string, OFFLINE: string }} StatusMessages
    */
@@ -44,28 +26,6 @@
    * loud and that module needs review.
    */
   const API_CONFIG = {};
-
-  /**
-   * Canonical API route paths.
-   * Purpose: Prevent typos and drift between client and server route definitions.
-   */
-  const ROUTES = {
-    API: /** @type {ApiPaths} */({
-      ACCOUNT_CREATE: '/api/account/create',
-      ACCOUNT_LOGIN: '/api/account/login',
-      ACCOUNT_LOGOUT: '/api/account/logout',
-      ACCOUNT_AVAILABLE: '/api/account/available',
-      GITHUB_TOKEN: '/api/github-token',
-      SAVE_EVALUATION: '/api/save-evaluation',
-      SAVE_USER_DATA: '/api/save-user-data',
-      USER_SAVE: '/api/user/save',
-      USER_LOAD: '/api/user/load',
-      EVALUATIONS_LIST: '/api/evaluations/list',
-      EVALUATION_SAVE: '/api/evaluation/save',
-      FEEDBACK: '/api/feedback',
-      ADMIN_BASE: '/api/admin'
-    })
-  };
 
   /**
    * UI settings and common values.
@@ -121,9 +81,9 @@
     Z_INDEX_BASE: UI_SETTINGS.TIMINGS.MODAL_Z_INDEX_BASE
   });
 
-  const CONSTANTS = { API_CONFIG, ROUTES, UI_SETTINGS, ERROR_MESSAGES, STATUS_MESSAGES, MODAL_CONFIG };
+  const CONSTANTS = { API_CONFIG, UI_SETTINGS, ERROR_MESSAGES, STATUS_MESSAGES, MODAL_CONFIG };
 
-  try { window.CONSTANTS = CONSTANTS; } catch (_) {}
+  try { window.CONSTANTS = CONSTANTS; } catch (_) { if (typeof logError === "function") logError(_); }
   if (typeof module !== 'undefined') {
     module.exports = CONSTANTS;
   }

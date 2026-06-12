@@ -22,14 +22,14 @@
   function focusFirstInteractive(root) {
     const sel = 'input, select, textarea, button, [tabindex]:not([tabindex="-1"])';
     const el = root.querySelector(sel);
-    if (el) { try { el.focus(); } catch (_) {} }
+    if (el) { try { el.focus(); } catch (_) { if (typeof logError === "function") logError(_); } }
   }
 
   // Auto-init on DOM ready
   document.addEventListener('DOMContentLoaded', function () {
     initRequiredIndicators(document);
     if (window.UIStates && typeof window.UIStates.initDirtyTracking === 'function') {
-      try { window.UIStates.initDirtyTracking(document); } catch (_) {}
+      try { window.UIStates.initDirtyTracking(document); } catch (_) { if (typeof logError === "function") logError(_); }
     }
   });
 

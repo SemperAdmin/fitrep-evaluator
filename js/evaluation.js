@@ -167,7 +167,36 @@ function updateProgress() {
 
 // Main Functions
 // startEvaluation()
+/**
+ * Hard consent gate. The ToS overlay is presentational and can be removed from
+ * the console, so enforce acceptance at the point of action. Re-presents the
+ * gate when consent is missing.
+ * @returns {boolean} True when Terms of Service have been accepted.
+ */
+function requireLegalConsent() {
+    let accepted = false;
+    try {
+        accepted = !!(typeof global.getLegalConsentState === 'function'
+            && global.getLegalConsentState().termsAccepted);
+    } catch (_) { accepted = false; }
+    if (!accepted) {
+        try {
+            if (typeof global.alert === 'function') {
+                global.alert('You must accept the Terms of Service before using the evaluator.');
+            }
+        } catch (_) { if (typeof logError === "function") logError(_); }
+        // Re-present the gate if the consent module exposes a hook.
+        try {
+            if (typeof global.showTermsOfServiceGate === 'function') {
+                global.showTermsOfServiceGate();
+            }
+        } catch (_) { if (typeof logError === "function") logError(_); }
+    }
+    return accepted;
+}
+
 function startEvaluation() {
+    if (!requireLegalConsent()) return;
     const marineName = document.getElementById('marineNameInput').value.trim();
     const fromDate = document.getElementById('fromDateInput').value;
     const toDate = document.getElementById('toDateInput').value;
@@ -197,9 +226,7 @@ function startEvaluation() {
         toDate,
         evaluatorName,
         // New: store occasion in evaluationMeta
-        occasionType,
-        // Track whether this eval was started from RS profile
-        startedFromProfile: !!window.currentProfile
+        occasionType
     });
     
     isReportingSenior = (selection === 'yes');
@@ -379,16 +406,16 @@ function renderCurrentTrait() {
             </div>
 
             <div class="action-buttons">
-                <button class="btn btn-does-not-meet" onclick="handleGradeAction('does-not-meet')"
+                <button class="btn btn-does-not-meet" data-action="grade-action" data-grade="does-not-meet"
                         ${isAtA ? 'disabled' : ''}>
                     <span class="button-label">Does Not Meet</span>
                     <span class="button-description">Select lower standard</span>
                 </button>
-                <button class="btn btn-meets" onclick="handleGradeAction('meets')">
+                <button class="btn btn-meets" data-action="grade-action" data-grade="meets">
                     <span class="button-label">Meets</span>
                     <span class="button-description">Assign this grade</span>
                 </button>
-                <button class="btn btn-surpasses" onclick="handleGradeAction('surpasses')">
+                <button class="btn btn-surpasses" data-action="grade-action" data-grade="surpasses">
                     <span class="button-label">Surpasses</span>
                     <span class="button-description">Try higher standard</span>
                 </button>
@@ -508,17 +535,16 @@ function renderCompletedTraitsAccordion() {
         // Section as accordion item with ARIA attributes for accessibility
         // Saves state to sessionStorage when toggled
         const contentId = `${sectionId}-content`;
-        const escapedTitle = safeSectionTitle.replace(/'/g, "\\'");
         accordionHTML += `
             <div class="accordion-item">
                 <input type="checkbox" id="${sectionId}" aria-hidden="true" ${checkedAttr}
-                       onchange="this.nextElementSibling.setAttribute('aria-expanded', this.checked); saveAccordionState('${escapedTitle}', this.checked);">
+                       data-action="accordion-toggle" data-accordion-title="${safeSectionTitle}">
                 <label for="${sectionId}" class="accordion-header accordion-section-header"
                        role="button"
                        aria-expanded="${ariaExpanded}"
                        aria-controls="${contentId}"
                        tabindex="0"
-                       onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}">
+                       data-keyactivate>
                     <div class="accordion-header-content">
                         <span class="accordion-section-title">${safeSectionTitle}</span>
                         <span class="accordion-trait-count">${traitCount} trait${traitCount !== 1 ? 's' : ''}</span>
@@ -606,7 +632,7 @@ function showJustificationModal() {
             modal.style.height = '100%';
             modal.style.alignItems = 'center';
             modal.style.justifyContent = 'center';
-        } catch (_) {}
+        } catch (_) { if (typeof logError === "function") logError(_); }
         if (window.ModalController) {
             window.ModalController.register('justificationModal', { labelledBy: 'justificationTitle', describedBy: 'justificationDesc', focusFirst: '#justificationText' });
             window.ModalController.openById('justificationModal');
@@ -625,14 +651,15 @@ function showJustificationModal() {
             modal.style.height = '100%';
             modal.style.alignItems = 'center';
             modal.style.justifyContent = 'center';
-        } catch (_) {}
+        } catch (_) { if (typeof logError === "function") logError(_); }
     }
     document.getElementById('justificationText').focus();
 }
 
 function saveJustification() {
+    if (!requireLegalConsent()) return;
     const justificationText = document.getElementById('justificationText').value.trim();
-    
+
     if (!justificationText) {
         alert('Please provide justification for this marking before continuing.');
         return;
@@ -651,15 +678,15 @@ function saveJustification() {
     // PoC: voice module removed. Voice cleanup blocks no longer needed.
 
     const modal = document.getElementById('justificationModal');
-    try { if (window.ModalController) window.ModalController.closeById('justificationModal'); } catch (_) {}
-    try { if (window.ModalController) window.ModalController.closeById('reevaluateModal'); } catch (_) {}
-    if (window.A11y) try { A11y.closeDialog(modal); } catch (_) {}
+    try { if (window.ModalController) window.ModalController.closeById('justificationModal'); } catch (_) { if (typeof logError === "function") logError(_); }
+    try { if (window.ModalController) window.ModalController.closeById('reevaluateModal'); } catch (_) { if (typeof logError === "function") logError(_); }
+    if (window.A11y) try { A11y.closeDialog(modal); } catch (_) { if (typeof logError === "function") logError(_); }
     modal.classList.remove('active');
     modal.setAttribute('aria-hidden', 'true');
-    try { modal.style.display = 'none'; } catch (_) {}
+    try { modal.style.display = 'none'; } catch (_) { if (typeof logError === "function") logError(_); }
     try {
         document.querySelectorAll('.sa-modal-backdrop[data-modal-id="justificationModal"]').forEach(b => { if (b && b.parentNode) b.parentNode.removeChild(b); });
-    } catch (_) {}
+    } catch (_) { if (typeof logError === "function") logError(_); }
     pendingEvaluation = null;
 
     // Handle post-save navigation
@@ -717,20 +744,20 @@ function cancelJustification() {
         if (window.ModalController) {
             window.ModalController.closeById('justificationModal');
         } else {
-            if (window.A11y) try { A11y.closeDialog(modal); } catch (_) {}
+            if (window.A11y) try { A11y.closeDialog(modal); } catch (_) { if (typeof logError === "function") logError(_); }
             modal.classList.remove('active');
             modal.setAttribute('aria-hidden', 'true');
-            try { modal.style.display = 'none'; } catch (_) {}
+            try { modal.style.display = 'none'; } catch (_) { if (typeof logError === "function") logError(_); }
         }
     } catch (_) {
-        if (window.A11y) try { A11y.closeDialog(modal); } catch (_) {}
+        if (window.A11y) try { A11y.closeDialog(modal); } catch (_) { if (typeof logError === "function") logError(_); }
         modal.classList.remove('active');
         modal.setAttribute('aria-hidden', 'true');
-        try { modal.style.display = 'none'; } catch (_) {}
+        try { modal.style.display = 'none'; } catch (_) { if (typeof logError === "function") logError(_); }
     }
     try {
         document.querySelectorAll('.sa-modal-backdrop[data-modal-id="justificationModal"]').forEach(b => { if (b && b.parentNode) b.parentNode.removeChild(b); });
-    } catch (_) {}
+    } catch (_) { if (typeof logError === "function") logError(_); }
     pendingEvaluation = null;
 }
 
@@ -809,7 +836,7 @@ function populateReviewScreen() {
                          ${safeJustification} 
                      </div> 
                      <div class="button-row" style="margin-top: 10px;"> 
-                         <button class="btn btn-meets" onclick="editTrait('${trait.key}')">Re-evaluate Trait</button> 
+                         <button class="btn btn-meets" data-action="edit-trait" data-trait-key="${trait.key}">Re-evaluate Trait</button>
                      </div> 
                  </div> 
              `; 
@@ -931,19 +958,19 @@ function cancelReevaluation() {
         if (window.ModalController) {
             window.ModalController.closeById('reevaluateModal');
         } else {
-            if (window.A11y) try { A11y.closeDialog(modal); } catch (_) {}
+            if (window.A11y) try { A11y.closeDialog(modal); } catch (_) { if (typeof logError === "function") logError(_); }
             modal.classList.remove('active');
             modal.setAttribute('aria-hidden', 'true');
         }
     } catch (_) {
-        if (window.A11y) try { A11y.closeDialog(modal); } catch (_) {}
+        if (window.A11y) try { A11y.closeDialog(modal); } catch (_) { if (typeof logError === "function") logError(_); }
         modal.classList.remove('active');
         modal.setAttribute('aria-hidden', 'true');
     }
     try {
         const bd = document.querySelector('.sa-modal-backdrop[data-modal-id="reevaluateModal"]');
         if (bd && bd.parentNode) bd.parentNode.removeChild(bd);
-    } catch (_) {}
+    } catch (_) { if (typeof logError === "function") logError(_); }
     const reviewCard = document.getElementById('reviewCard');
     if (reviewCard) { reviewCard.classList.add('active'); reviewCard.style.display = 'block'; }
 }
@@ -975,12 +1002,12 @@ function startReevaluation() {
     if (index !== -1) currentTraitIndex = index;
 
     // Hide modal and review card, then show evaluation
-    try { if (window.ModalController) window.ModalController.closeById('reevaluateModal'); } catch (_) {}
-    if (window.A11y) try { A11y.closeDialog(modal); } catch (_) {}
+    try { if (window.ModalController) window.ModalController.closeById('reevaluateModal'); } catch (_) { if (typeof logError === "function") logError(_); }
+    if (window.A11y) try { A11y.closeDialog(modal); } catch (_) { if (typeof logError === "function") logError(_); }
     modal.classList.remove('active');
     modal.setAttribute('aria-hidden', 'true');
-    try { modal.style.display = 'none'; } catch (_) {}
-    try { document.querySelectorAll('.sa-modal-backdrop[data-modal-id="reevaluateModal"]').forEach(b => { if (b && b.parentNode) b.parentNode.removeChild(b); }); } catch (_) {}
+    try { modal.style.display = 'none'; } catch (_) { if (typeof logError === "function") logError(_); }
+    try { document.querySelectorAll('.sa-modal-backdrop[data-modal-id="reevaluateModal"]').forEach(b => { if (b && b.parentNode) b.parentNode.removeChild(b); }); } catch (_) { if (typeof logError === "function") logError(_); }
     isInReviewMode = false;
     const reviewCard = document.getElementById('reviewCard');
     if (reviewCard) {
@@ -1018,13 +1045,13 @@ function goBackToLastTrait() {
 // proceedToDirectedComments()
 function proceedToDirectedComments() {
     isInReviewMode = false;
-    try { if (window.ModalController) window.ModalController.closeAll(); } catch (_) {}
+    try { if (window.ModalController) window.ModalController.closeAll(); } catch (_) { if (typeof logError === "function") logError(_); }
     try {
         document.querySelectorAll('.evaluation-card, .review-card, .section-i-generation-card, .summary-card').forEach(card => {
             card.classList.remove('active');
             card.style.display = 'none';
         });
-    } catch (_) {}
+    } catch (_) { if (typeof logError === "function") logError(_); }
     const progressEl = document.getElementById('progressText');
     if (progressEl) progressEl.textContent = 'Directed Comments Selection';
     const dcCard = document.getElementById('directedCommentsCard');
@@ -1036,7 +1063,7 @@ function proceedToDirectedComments() {
             renderDirectedCommentsGrid();
         }
     } catch (_) { /* ignore */ }
-    try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (_) {}
+    try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (_) { if (typeof logError === "function") logError(_); }
 }
 
 function showSummary() {
@@ -1079,14 +1106,11 @@ function showSummary() {
     const summaryGrid = document.getElementById('summaryGrid');
     summaryGrid.innerHTML = '';
 
-    // Toggle summary action buttons based on origin
+    // Ensure the Start Over action is visible on the summary
     try {
-        const rsBtn = document.getElementById('viewRsDashboardBtn');
         const startOverBtn = document.getElementById('startOverBtn');
-        const fromProfile = !!(evaluationMeta && evaluationMeta.startedFromProfile);
-        if (rsBtn) rsBtn.style.display = fromProfile ? '' : 'none';
-        if (startOverBtn) startOverBtn.style.display = fromProfile ? 'none' : '';
-    } catch (_) { /* ignore */ }
+        if (startOverBtn) startOverBtn.style.display = '';
+    } catch (_) { if (typeof logError === "function") logError(_); }
     
     // Add trait evaluations
     Object.keys(evaluationResults).forEach(key => {

@@ -22,17 +22,7 @@
       }
     },
     {
-      "files": ["server-example.js"],
-      "env": {
-        "node": true,
-        "es2021": true
-      },
-      "rules": {
-        "no-useless-catch": "off"
-      }
-    },
-    {
-      "files": ["server/**/*.js", "scripts/**/*.js", "tests/**/*.js"],
+      "files": ["scripts/**/*.js", "tests/**/*.js"],
       "env": {
         "node": true,
         "es2021": true

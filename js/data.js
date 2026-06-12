@@ -174,33 +174,6 @@ const firepData = {
     }
 };
 
-// Enhanced FITREP Data with Examples
-const enhancedFirepData = {
-    ...firepData,
-    examples: {
-        D: {
-            performance: {
-                A: "Failed to complete assigned tasks, required constant supervision, consistently missed deadlines",
-                B: "Completed all assigned duties adequately, met basic expectations and deadlines consistently",
-                C: "Completed most duties with minimal supervision but showed limited initiative beyond requirements",
-                D: "Exceeded expectations in daily tasks, improved unit procedures, and mentored junior Marines effectively",
-                E: "Strong performance in most areas but occasionally fell short of exceptional standards",
-                F: "Exceptional performance leading major initiatives, recognized by senior leadership for innovative solutions",
-                G: "Outstanding performance exceeding all expectations, set new standards for unit excellence"
-            },
-            proficiency: {
-                A: "Lacks basic technical skills required for position, requires extensive retraining",
-                B: "Demonstrates competent technical knowledge and skills appropriate for grade and experience",
-                C: "Shows basic proficiency with room for improvement in complex technical areas",
-                D: "Strong technical expertise, effectively trains others and troubleshoots complex problems",
-                E: "Good technical skills but not consistently at expert level in all required areas",
-                F: "Technical expert sought after for complex problems, develops innovative solutions",
-                G: "Exceptional technical mastery, recognized as subject matter expert by peers and seniors"
-            }
-        }
-    }
-};
-
 // Data verification function
 function verifyFirepData() {
     console.log('=== FITREP Data Verification ===');

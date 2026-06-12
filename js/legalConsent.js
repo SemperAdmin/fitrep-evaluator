@@ -105,11 +105,11 @@
       modal.setAttribute('aria-labelledby', `legal-modal-title-${docKey}`);
 
       const html = `
-        <div class="legal-modal-overlay" onclick="closeLegalDocumentModal('${docKey}')">
-          <div class="legal-modal-content" onclick="event.stopPropagation()">
+        <div class="legal-modal-overlay" data-legal-overlay="${docKey}">
+          <div class="legal-modal-content">
             <div class="legal-modal-header">
               <h2 id="legal-modal-title-${docKey}" class="legal-modal-title">${docConfig.title}</h2>
-              <button type="button" class="legal-modal-close" aria-label="Close" onclick="closeLegalDocumentModal('${docKey}')">
+              <button type="button" class="legal-modal-close" aria-label="Close" data-action="close-legal-doc" data-doc="${docKey}">
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
@@ -117,7 +117,7 @@
               <p style="color: #999; text-align: center; padding: 20px;">Loading document...</p>
             </div>
             <div class="legal-modal-footer">
-              <button type="button" class="btn btn-primary" onclick="closeLegalDocumentModal('${docKey}')">Close</button>
+              <button type="button" class="btn btn-primary" data-action="close-legal-doc" data-doc="${docKey}">Close</button>
             </div>
           </div>
         </div>
@@ -411,9 +411,9 @@ For questions, contact the originating command in PoC-CHARTER.md.`
               <div class="tos-links" style="margin: 12px 0; padding: 12px; background: #f0f7ff; border-left: 3px solid #2196F3; border-radius: 2px;">
                 <p style="margin: 0 0 8px 0; font-size: 12px;">
                   View full documents:
-                  <a href="#" class="legal-link-inline" data-doc="terms" onclick="event.preventDefault(); openLegalDocumentModal('terms');">Terms of Service</a> &nbsp;·&nbsp;
-                  <a href="#" class="legal-link-inline" data-doc="privacy" onclick="event.preventDefault(); openLegalDocumentModal('privacy');">Privacy Policy</a> &nbsp;·&nbsp;
-                  <a href="#" class="legal-link-inline" data-doc="disclaimer" onclick="event.preventDefault(); openLegalDocumentModal('disclaimer');">Disclaimer</a>
+                  <a href="#" class="legal-link-inline" data-action="open-legal-doc" data-doc="terms">Terms of Service</a> &nbsp;·&nbsp;
+                  <a href="#" class="legal-link-inline" data-action="open-legal-doc" data-doc="privacy">Privacy Policy</a> &nbsp;·&nbsp;
+                  <a href="#" class="legal-link-inline" data-action="open-legal-doc" data-doc="disclaimer">Disclaimer</a>
                 </p>
               </div>
             </div>
@@ -486,6 +486,9 @@ For questions, contact the originating command in PoC-CHARTER.md.`
     CONSENT_STATE.acceptanceTimestamp = new Date().toISOString();
     CONSENT_STATE.acceptanceAcknowledged = true;
 
+    // Tear down through ModalController so the focus trap, body lock, and stack
+    // entry are released before the node is removed.
+    try { if (window.ModalController) window.ModalController.closeById('tosModalOverlay'); } catch (_) { if (typeof logError === "function") logError(_); }
     const overlay = document.getElementById('tosModalOverlay');
     if (overlay && overlay.parentNode) {
       overlay.parentNode.removeChild(overlay);
@@ -527,6 +530,26 @@ For questions, contact the originating command in PoC-CHARTER.md.`
         el.classList.add('tos-app-hidden');
       });
 
+      // Route the gate through the app modal system so keyboard focus is
+      // trapped within the dialog (Tab cycles, focus starts on the checkbox).
+      try {
+        if (window.ModalController) {
+          window.ModalController.register('tosModalOverlay', {
+            labelledBy: 'tosModalTitle',
+            describedBy: 'tosModalBody',
+            focusFirst: '#tosCheckbox',
+            closeOnBackdrop: false
+          });
+          window.ModalController.openById('tosModalOverlay');
+        } else if (window.A11y && typeof window.A11y.openDialog === 'function') {
+          window.A11y.openDialog(tosModal, {
+            labelledBy: 'tosModalTitle',
+            describedBy: 'tosModalBody',
+            focusFirst: '#tosCheckbox'
+          });
+        }
+      } catch (_) { if (typeof logError === "function") logError(_); }
+
       console.log('[legalConsent] Terms of Service acceptance required.');
     }, 100);
 
@@ -540,6 +563,17 @@ For questions, contact the originating command in PoC-CHARTER.md.`
    */
   window.getLegalConsentState = function() {
     return Object.freeze({ ...CONSENT_STATE });
+  };
+
+  /**
+   * Public API: Re-present the Terms of Service gate.
+   * Used by action-level consent guards when consent is missing (e.g. the
+   * overlay was dismissed from the console).
+   */
+  window.showTermsOfServiceGate = function() {
+    if (!CONSENT_STATE.termsAccepted && !document.getElementById('tosModalOverlay')) {
+      initializeLegalConsent();
+    }
   };
 
   /**

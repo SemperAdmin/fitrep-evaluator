@@ -304,18 +304,6 @@ body {
 .skeleton-block { height: 48px; }
 @keyframes shimmer { 100% { left: 100%; } }
 
-/* Readonly form display (matches form-input alignment) */
-.form-static {
-    padding: 10px 12px;
-    min-height: 38px;
-    display: flex;
-    align-items: center;
-    border: 1px solid #e5e7eb;
-    border-radius: 6px;
-    background: #f9fafb;
-    color: #111827;
-}
-
 /* Layout */
 .container {
     max-width: 900px;
