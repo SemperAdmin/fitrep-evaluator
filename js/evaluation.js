@@ -1227,4 +1227,25 @@ if (typeof document !== 'undefined' && document) {
     }
 }
 
+/**
+ * Whether an evaluation has started and would be lost on unload. All state is
+ * in-memory with no persistence, so any recorded work — including a fully
+ * drafted report — is destroyed by a refresh or navigation.
+ * @returns {boolean} True once at least one trait result has been recorded.
+ */
+function isEvaluationInProgress() {
+    return Object.keys(evaluationResults).length > 0;
+}
+
+// Warn before a refresh or navigation silently discards in-progress work.
+if (typeof global.addEventListener === 'function') {
+    global.addEventListener('beforeunload', function (event) {
+        if (!isEvaluationInProgress()) return undefined;
+        event.preventDefault();
+        // Legacy browsers require returnValue to be set to trigger the prompt.
+        event.returnValue = '';
+        return '';
+    });
+}
+
 })(typeof window !== 'undefined' ? window : globalThis);
