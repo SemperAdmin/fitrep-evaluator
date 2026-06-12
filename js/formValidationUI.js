@@ -74,40 +74,20 @@
     return res;
   }
 
-  async function tryServerValidate(field, res, serverValidators){
-    try {
-      const id = field.id || field.name || '';
-      const sv = serverValidators && serverValidators[id];
-      if (!sv || !res.valid) return res;
-      const svr = await Promise.resolve(sv(String(field.value)));
-      const merged = {
-        valid: !!svr?.valid,
-        message: String(svr?.message || (svr?.valid ? '' : res.message || 'Invalid.'))
-      };
-      updateFieldUI(field, merged);
-      return merged;
-    } catch (_) {
-      // On network or server errors, preserve client result
-      return res;
-    }
-  }
-
   function attachFieldListeners(field, opts){
     const wait = Number(opts?.debounceMs || 300);
 
-    // Shared validation logic - validate field, run server validation, and update UI
-    const validate = async () => {
+    // Client-only validation. Server validation removed: the PoC has no backend.
+    const validate = () => {
       const res = validateField(field);
-      const finalRes = await tryServerValidate(field, res, opts?.serverValidators);
-      updateFieldUI(field, finalRes);
-      if (opts?.onFieldValidated) opts.onFieldValidated(field, finalRes);
+      if (opts?.onFieldValidated) opts.onFieldValidated(field, res);
     };
 
     const onInputDebounced = debounce(validate, wait);
 
-    field.addEventListener('blur', async () => {
+    field.addEventListener('blur', () => {
       field.dataset.touched = 'true';
-      await validate();
+      validate();
     });
     field.addEventListener('input', () => {
       if (field.dataset.touched !== 'true') return; // only after user interacts
