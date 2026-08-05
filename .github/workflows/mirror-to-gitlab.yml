@@ -1,0 +1,74 @@
+name: Mirror to GitLab
+
+# One-way mirror: GitHub is the source of truth, web.git.mil is the replica.
+# Pushes the default branch and all tags. Never pulls from GitLab.
+#
+# Required repository secret:
+#   GITLAB_MIRROR_TOKEN - GitLab project access token, Maintainer role,
+#                         write_repository scope, on semper_admin/fitrep-evaluator
+#
+# Rotation: token expires 2027-08-04. Rotate before then or the nightly run fails.
+
+on:
+  push:
+    branches: [main]
+    tags: ['**']
+  workflow_dispatch:
+  schedule:
+    # Nightly drift backstop, 09:00 UTC (23:00 HST previous day)
+    - cron: '0 9 * * *'
+
+concurrency:
+  group: gitlab-mirror
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GITLAB_HOST: web.git.mil
+      GITLAB_PATH: semper_admin/fitrep-evaluator
+    steps:
+      - name: Checkout full history and tags
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Verify GitLab endpoint is reachable
+        run: |
+          set -euo pipefail
+          code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 30 \
+            "https://${GITLAB_HOST}/${GITLAB_PATH}.git/info/refs?service=git-upload-pack" || echo 000)
+          echo "Anonymous probe returned HTTP ${code}"
+          if [ "$code" = "000" ]; then
+            echo "::error::No route to ${GITLAB_HOST} from this runner. Mirror cannot proceed."
+            exit 1
+          fi
+
+      - name: Push branch and tags to GitLab
+        env:
+          GITLAB_TOKEN: ${{ secrets.GITLAB_MIRROR_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${GITLAB_TOKEN}" ]; then
+            echo "::error::GITLAB_MIRROR_TOKEN is empty. Add the secret in repo Settings."
+            exit 1
+          fi
+          remote="https://github-mirror-bot:${GITLAB_TOKEN}@${GITLAB_HOST}/${GITLAB_PATH}.git"
+          git remote add gitlab "$remote"
+
+          # Force push is required: the GitLab copy holds unrelated history.
+          git push --force gitlab HEAD:refs/heads/main
+          git push --force --tags gitlab
+
+          git remote remove gitlab
+
+      - name: Report tip SHA for verification
+        run: |
+          echo "GitHub main tip: $(git rev-parse HEAD)"
+          echo "Compare against https://${GITLAB_HOST}/${GITLAB_PATH}/-/commits/main"
