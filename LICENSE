@@ -1,0 +1,132 @@
+FITREP Evaluator - Proof of Concept
+Copyright (c) 2026 [INSERT FULL LEGAL NAME]. All rights reserved.
+
+================================================================================
+1. OWNERSHIP AND PROVENANCE
+================================================================================
+
+This software was conceived, authored, and developed by the copyright holder
+named above on personal time, using personal equipment, outside the scope of
+any official duties. It is NOT a work of the United States Government and is
+NOT subject to 17 U.S.C. Section 105. Copyright is held personally and
+exclusively by the author.
+
+This software is not affiliated with, endorsed by, or an official product of
+the United States Marine Corps, the Department of the Navy, the Department of
+War, or any component thereof. References to Marine Corps orders, forms, and
+processes are nominative and descriptive only.
+
+================================================================================
+2. NO OPEN SOURCE GRANT
+================================================================================
+
+The source code of this project is published publicly for transparency,
+methodology review, and evaluation. Public visibility of the source is NOT a
+license grant. This is a source-available proprietary work, not open source
+software. No rights are granted except those expressly stated in Section 3.
+
+================================================================================
+3. PERMITTED USE
+================================================================================
+
+Subject to the restrictions in Section 4, you are permitted to:
+
+  a. View and read the source code for the purpose of understanding or
+     reviewing the marking methodology.
+
+  b. Operate the author-hosted instance of the application for the sole
+     purpose of evaluating the left-to-right marking methodology against
+     synthetic data.
+
+  c. Provide feedback to the author through the designated feedback channel.
+
+================================================================================
+4. RESTRICTIONS
+================================================================================
+
+Except with the express prior written permission of the copyright holder, you
+may NOT:
+
+  a. Copy, reproduce, or redistribute the software or any portion of it.
+
+  b. Modify, adapt, translate, or create derivative works.
+
+  c. Fork, clone, or otherwise reproduce this repository for the purpose of
+     deploying, hosting, or operating the application or any derivative of it.
+
+  d. Remove, disable, bypass, or alter any of the following: the proof-of-
+     concept acknowledgment banner, the terms-of-service consent gate, the
+     synthetic-identifier validation, the network egress guards, or the
+     persistent-storage guards.
+
+  e. Sublicense, sell, rent, lease, or otherwise commercialize the software.
+
+  f. Use the software, or any derivative of it, to process, store, or transmit
+     Personally Identifiable Information, Controlled Unclassified Information,
+     or any real personnel record.
+
+  g. Use the software to produce any evaluation submitted through an official
+     chain of command or used to influence any personnel decision.
+
+  h. Represent the software, or any derivative, as an authorized, official, or
+     accredited system of any military service or government agency.
+
+================================================================================
+5. PROOF OF CONCEPT STATUS
+================================================================================
+
+This software operates under a Proof of Concept Charter (PoC-CHARTER.md) and
+associated Terms of Service, Privacy Policy, and As-Is Disclaimer, all of which
+are incorporated into this license by reference. Where this license and those
+documents address the same subject, the more restrictive provision controls.
+
+This software is not a system of record. It holds no Authorization to Operate.
+It is not registered in DADMS or DITPR-DON. It accepts synthetic data only.
+
+================================================================================
+6. TRADEMARKS
+================================================================================
+
+Marine Corps insignia, marks, and imagery included in this repository remain
+the property of the United States Marine Corps and are governed by 10 U.S.C.
+Section 7881 and the Marine Corps Trademark and Licensing Program. Their
+inclusion here is for non-commercial illustrative purposes and constitutes no
+claim of ownership by the copyright holder.
+
+"Semper Admin" and any associated logo are the property of the copyright
+holder.
+
+================================================================================
+7. NO WARRANTY
+================================================================================
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, ACCURACY, AND SUITABILITY
+FOR ANY OFFICIAL OR EVALUATIVE PURPOSE.
+
+IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES, OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING
+FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+IN THE SOFTWARE.
+
+The marking methodology demonstrated by this software is unvalidated. It has
+not been tested, approved, or endorsed for use in military personnel
+evaluation. The Reporting Senior retains sole and non-delegable responsibility
+for all marking decisions under MCO 1610.7B.
+
+================================================================================
+8. TERMINATION
+================================================================================
+
+Any use in breach of Section 4 terminates the permissions granted in Section 3
+automatically and without notice.
+
+================================================================================
+9. PERMISSIONS AND CONTACT
+================================================================================
+
+Requests for rights beyond those granted in Section 3, including sponsorship,
+transition to government ownership, or accredited deployment, should be
+directed to the copyright holder through the feedback channel identified in the
+application.
