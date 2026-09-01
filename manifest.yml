@@ -1,0 +1,9 @@
+---
+applications:
+  - name: fitrep-evaluator
+    memory: 128M
+    disk_quota: 1G
+    instances: 1
+    path: .
+    buildpacks:
+      - staticfile_buildpack

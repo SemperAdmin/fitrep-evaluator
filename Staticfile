@@ -1,0 +1,8 @@
+# Staticfile for the cloud.gov / Cloud Foundry staticfile buildpack.
+#
+# root: .          Serves the repository root, where index.html lives.
+#                  The buildpack defaults to ./public, which holds only
+#                  favicon.svg, so without this line the deployed site 404s.
+# force_https: true  Redirects http to https at the app layer.
+root: .
+force_https: true

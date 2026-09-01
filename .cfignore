@@ -1,0 +1,12 @@
+# Keep build cruft, secrets, and dev-only files out of the deployed droplet.
+.git/
+.github/
+.trae/
+node_modules/
+tests/
+scripts/
+docs/
+.env
+.eslintrc.json
+package.json
+package-lock.json
