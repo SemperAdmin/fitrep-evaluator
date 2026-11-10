@@ -1,0 +1,109 @@
+name: Deploy to GitHub Pages
+
+# Publishes a curated site folder instead of the repository root.
+#
+# WHY. Pages was set to the legacy "deploy from branch" source on main:/,
+# which serves every tracked file: docs/, scripts/, tests/, audit reports,
+# and handoff notes. Only the files the app loads belong on a public web
+# path. This workflow assembles that set into _site/ and deploys it.
+#
+# ONE-TIME SETTING. After this workflow is on main, switch the source in
+# Settings -> Pages -> Build and deployment -> Source to "GitHub Actions".
+# Until then the legacy branch build keeps serving the repository root.
+#
+# SITE CONTENTS. Keep this list equal to what index.html and js/ load.
+#   index.html, styles.css, css/, js/, assets/, styles/, public/
+#   PRIVACY_POLICY.md, TERMS_OF_SERVICE.md, AS_IS_DISCLAIMER.md
+#   (the three legal files are fetched by js/legalConsent.js)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    # workflow_dispatch accepts any ref and has no branch filter of its own.
+    # Refuse every ref but main so a manual run never publishes a feature
+    # branch. deploy needs build, so it is skipped too.
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Assemble site folder
+        run: |
+          set -euo pipefail
+          # Every path here is required. A missing one fails the build with
+          # a named error instead of publishing a broken site.
+          required="index.html styles.css PRIVACY_POLICY.md TERMS_OF_SERVICE.md AS_IS_DISCLAIMER.md css js assets styles public"
+          missing=0
+          for path in $required; do
+            if [ ! -e "$path" ]; then
+              echo "::error::Required site path '$path' is missing. Update the list in pages.yml if it was renamed or removed."
+              missing=1
+            fi
+          done
+          [ "$missing" -eq 0 ] || exit 1
+          mkdir _site
+          cp -r $required _site/
+          touch _site/.nojekyll
+
+      - name: Guard the site folder
+        run: |
+          set -euo pipefail
+          # Nothing outside the curated set reaches the public path.
+          for blocked in docs scripts tests server deploy .github .trae node_modules; do
+            if [ -e "_site/$blocked" ]; then
+              echo "::error::_site contains $blocked, which must not be published"
+              exit 1
+            fi
+          done
+          # No credential-shaped strings, whole or split into quoted parts.
+          if grep -rIlE '(gh[pousr]_|github_pat_|glpat-|AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY)' _site; then
+            echo "::error::credential-shaped string found in the site folder"
+            exit 1
+          fi
+          echo "Site folder holds $(find _site -type f | wc -l) files."
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Configure Pages
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
