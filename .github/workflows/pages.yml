@@ -30,6 +30,10 @@ concurrency:
 
 jobs:
   build:
+    # workflow_dispatch accepts any ref and has no branch filter of its own.
+    # Refuse every ref but main so a manual run never publishes a feature
+    # branch. deploy needs build, so it is skipped too.
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -50,10 +54,19 @@ jobs:
       - name: Assemble site folder
         run: |
           set -euo pipefail
+          # Every path here is required. A missing one fails the build with
+          # a named error instead of publishing a broken site.
+          required="index.html styles.css PRIVACY_POLICY.md TERMS_OF_SERVICE.md AS_IS_DISCLAIMER.md css js assets styles public"
+          missing=0
+          for path in $required; do
+            if [ ! -e "$path" ]; then
+              echo "::error::Required site path '$path' is missing. Update the list in pages.yml if it was renamed or removed."
+              missing=1
+            fi
+          done
+          [ "$missing" -eq 0 ] || exit 1
           mkdir _site
-          cp index.html styles.css _site/
-          cp PRIVACY_POLICY.md TERMS_OF_SERVICE.md AS_IS_DISCLAIMER.md _site/
-          cp -r css js assets styles public _site/
+          cp -r $required _site/
           touch _site/.nojekyll
 
       - name: Guard the site folder
