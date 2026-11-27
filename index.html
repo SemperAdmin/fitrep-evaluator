@@ -9,7 +9,7 @@
          header, which static GitHub Pages hosting cannot set. -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; object-src 'none'; base-uri 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>FITREP Evaluator - PoC - Methodology Aid Only</title>
+    <title>FITREP Evaluator - Methodology Aid Only</title>
     <!-- Semper Admin token system loads first so all downstream styles inherit the variables. -->
     <link rel="stylesheet" href="css/semper-tokens.css">
     <link rel="stylesheet" href="styles.css">
@@ -116,7 +116,7 @@
             <div class="form-group">
                 <label class="form-label" for="marineNameInput">Synthetic Persona Identifier:</label>
                 <input type="text" class="form-input" id="marineNameInput" placeholder="MARINE_ALPHA_01 (synthetic only - no real names)" pattern="MARINE_[A-Z]+_\d{2}" required aria-required="true" autocomplete="off" spellcheck="false" title="Use synthetic identifiers only. Format: MARINE_ALPHA_01 through MARINE_ZULU_99.">
-                <p style="font-size: 12px; color: #b71c1c; margin: 6px 0 0 0;"><strong>PoC constraint:</strong> Do not enter real Marine names. Use only synthetic identifiers from the fixture.</p>
+                <p style="font-size: 12px; color: #b71c1c; margin: 6px 0 0 0;"><strong>Synthetic data only:</strong> Do not enter real Marine names. Use only synthetic identifiers from the fixture.</p>
             </div>
             
             <!-- New: Marine Rank dropdown -->
@@ -415,7 +415,7 @@
                 </div>
                 <div class="sa-modal-body">
                     <p><strong>DATA CATEGORY:</strong> Synthetic / Test Data Only</p>
-                    <p><strong>PROTECTION LEVEL:</strong> Unsecured PoC</p>
+                    <p><strong>PROTECTION LEVEL:</strong> Unsecured, publicly hosted</p>
                     <p><strong>Notice:</strong> This system is not authorized for the storage or processing of PII, CUI, or HIPAA regulated data. All data shown is for demonstration purposes.</p>
                     <hr style="margin: 16px 0; border: none; border-top: 1px solid #ddd;">
                     <p style="font-size: 12px; color: #666;">
@@ -491,7 +491,7 @@
     <!-- PoC Footer: single-line warning body. -->
     <footer class="poc-footer disclaimer-footer" role="contentinfo">
         <div class="poc-footer__content">
-            <p class="poc-footer__body">Not a system of record. Synthetic data only. Do not enter real Marine names, ranks, EDIPIs, evaluation periods, or narrative text. Not authorized for live personnel data, PII, CUI, or HIPAA-regulated content.</p>
+            <p class="poc-footer__body">Not a system of record. Synthetic data only. Do not enter real Marine names, ranks, EDIPIs, evaluation periods, or narrative text. Not authorized for live personnel data, PII, CUI, or HIPAA-regulated content. Not an official Department of the Navy or U.S. Marine Corps system.</p>
             <p class="poc-footer__body"><a href="https://forms.osi.apps.mil/r/k5QWzJDL9P" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline;">Submit Feedback</a></p>
         </div>
     </footer>
@@ -563,7 +563,7 @@
 
     <!-- Mode Selection Card: PoC supports single methodology walkthrough only. -->
     <div class="profile-card active" id="modeSelectionCard">
-        <div class="profile-title">FITREP Methodology Aid (Proof of Concept)</div>
+        <div class="profile-title">FITREP Methodology Aid</div>
         <p class="profile-description">This tool demonstrates the left-to-right marking methodology against synthetic Marines only.</p>
 
         <div class="mode-options">
@@ -576,7 +576,7 @@
 
         <div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
             <p style="font-size: 13px; color: #b71c1c;">
-                <strong>PoC constraint:</strong> Use synthetic identifiers only. No real Marine names, EDIPIs, ranks tied to individuals, or narrative text.
+                <strong>Synthetic data only:</strong> Use synthetic identifiers only. No real Marine names, EDIPIs, ranks tied to individuals, or narrative text.
             </p>
         </div>
 

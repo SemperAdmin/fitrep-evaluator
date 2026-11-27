@@ -1,76 +1,77 @@
-# FITREP Evaluator - Methodology Proof of Concept
+# FitRep Evaluator
 
-## Status
+A step-by-step aid for Reporting Seniors drafting a USMC Fitness Report, using a left-to-right marking method. It works with synthetic data only.
 
-PROOF OF CONCEPT. NOT A SYSTEM OF RECORD. NOT AUTHORIZED FOR LIVE PERSONNEL DATA.
+**Live:** https://fitrep-evaluator.app.cloud.gov
+**Also on GitHub Pages:** https://semperadmin.github.io/fitrep-evaluator/
 
-This project is a pre-acquisition Proof of Concept exploring an unbiased, left-to-right marking methodology for USMC Fitness Reports. It is not authorized to process, store, or transmit Personally Identifiable Information or Controlled Unclassified Information.
+## What it does
 
-## Authorization Posture
+- Walks through each trait left to right, one grade at a time: advance only when your evidence supports the next standard, and stop when it does not. Each decision is Does Not Meet, Meets or Surpasses, with a justification you write.
+- Collects directed comments and drafts the Section I comment in three styles: comprehensive, concise and promotion-focused.
+- Shows a summary of the evaluation that you can print, copy to the clipboard or download as a text file.
+- Includes an in-app help guide, a light and dark theme, and the Privacy Policy, Terms of Service and disclaimer inside the app.
 
-- ATO: Not issued. PoC operates outside an Authorization to Operate boundary.
-- PIA: Not issued. No live PII is accepted by design.
-- SORN: Not applicable in PoC mode because no live records are created.
-- DADMS or DITPR-DON: Not registered. Registration is a Phase 4 prerequisite for any production successor.
-- Hosting: Developer-controlled environments only. Public-internet hosting is prohibited.
+The method is described in [docs/METHODOLOGY.md](docs/METHODOLOGY.md).
 
-See PoC-CHARTER.md for the signed charter establishing these constraints.
+## Using it
 
-## Hard Constraints for All Users and Contributors
+Open the live site in a current browser. No account or CAC is needed. Acknowledge the notice and terms when the page opens, then enter the setup details and begin.
 
-1. Do not enter real Marine names, real Reporting Senior names, real EDIPIs, real email addresses, real ranks tied to identifiable individuals, real dates of rank, real evaluation periods, or real performance text.
-2. Use only the synthetic data fixture shipped with the application.
-3. Do not deploy this code to a public-internet endpoint.
-4. Do not connect this code to any data store, cloud database, or external API in a configuration that persists user input beyond the active browser session.
-5. Do not use this tool to produce evaluations submitted up the chain of command.
+Use synthetic data only. Do not enter real names, EDIPIs, email addresses, ranks tied to identifiable people, real dates of rank, real evaluation periods or real performance text. The setup form expects synthetic identifiers in the form `MARINE_ALPHA_01`. This tool does not produce official Fitness Reports, and its output is not to be submitted up the chain of command.
 
-Violations of these constraints convert the PoC into an unauthorized live system processing CUI, exposing the operator and the sponsoring command to Privacy Act and DoDI 5200.48 enforcement.
+Nothing is saved. Closing or reloading the page discards everything you entered.
 
-## Methodology Overview
+## Privacy and security
 
-The application demonstrates a left-to-right FITREP marking framework intended to reduce grade inflation and confirmation bias.
+- Nothing you enter leaves the browser. The app makes no network requests; its configuration (`js/config.js`) disables them outright.
+- Nothing is stored in the browser: no local or session storage, IndexedDB or cookies. Even the theme choice is not remembered.
+- The Content Security Policy in `index.html` is `default-src 'self'; object-src 'none'; base-uri 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'`, so the page loads nothing from other sites and cannot connect elsewhere.
+- One link leaves the app, and only if you select it: **Feedback** opens an external form in a new tab that needs a .mil network. No data is sent from the app to it.
+- The hosting platforms (cloud.gov and GitHub Pages) keep standard web server access logs, such as IP address, time, requested page and browser type, for operations and security. Semper Admin does not add tracking of its own.
 
-- Start at the baseline trait grade.
-- Step through each grade left to right against documented criteria.
-- Advance one grade only when performance evidence supports the next standard.
-- Stop when the evidence no longer supports advancement.
+See the [Privacy Policy](PRIVACY_POLICY.md), [Terms of Service](TERMS_OF_SERVICE.md), [As-Is Disclaimer](AS_IS_DISCLAIMER.md) and [Security](SECURITY.md).
 
-Each marking decision routes through one of three options: Does Not Meet, Meets, or Surpasses. Justifications are entered against synthetic Marines only and are not persisted.
+## Development
 
-## Synthetic Data Fixture
+Requires Node.js 18 or later (CI uses 20). There is no build step: the app is static HTML, CSS and JavaScript loaded by plain script tags.
 
-The application loads a static fixture file containing notional Marines with placeholder identifiers such as Marine Alpha-01, Marine Bravo-02, and so on. The fixture is the only acceptable input source. The fixture file resides at js/syntheticFixture.js and is loaded at startup. Any code path that ingests user-entered names is a defect to be filed and remediated.
+```bash
+npm ci               # installs ESLint only
+# open index.html in a browser, or serve the folder with any static server
+npm test             # node tests/run-tests.js
+npm run lint         # eslint .
+```
 
-## Environment
+## Deployment
 
-- Browser-only execution. No server-side runtime is required in PoC mode.
-- All persistence is disabled. localStorage, sessionStorage, IndexedDB, fetch, XMLHttpRequest, and WebSocket calls are removed from the production build.
-- All third-party integrations are removed. GitHub Actions workflows are disabled. Supabase modules are removed from package.json.
+| Environment | URL | How |
+|---|---|---|
+| cloud.gov | https://fitrep-evaluator.app.cloud.gov | `manifest.yml` and `Staticfile` (staticfile buildpack); manual **Deploy to cloud.gov** workflow. The sandbox is managed by the private cloudgov-redeploy repository. |
+| GitHub Pages | https://semperadmin.github.io/fitrep-evaluator/ | `.github/workflows/pages.yml` on push to `main`. It runs the tests, then publishes a curated set of files only (the app, its styles and scripts, and the three legal documents), not the whole repository. |
 
-## Setup for PoC Participants
+## Documentation
 
-1. Clone the repository to a developer-controlled workstation.
-2. Open index.html directly in a modern browser. No build step is required for the PoC artifact.
-3. Verify the warning banner appears at the top of the page and requires acknowledgment.
-4. Verify the synthetic fixture loads. No live name fields are exposed in the UI.
+- [docs/METHODOLOGY.md](docs/METHODOLOGY.md): the left-to-right marking method and the synthetic fixture.
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): how the page loads, where state lives, and what the app deliberately lacks.
+- [docs/POC-GOVERNANCE.md](docs/POC-GOVERNANCE.md): the original proof-of-concept terms, kept as a record.
+- [Privacy Policy](PRIVACY_POLICY.md), [Terms of Service](TERMS_OF_SERVICE.md), [As-Is Disclaimer](AS_IS_DISCLAIMER.md).
 
-## Reporting Defects
+## Feedback and support
 
-Defects are filed in the project tracker behind the developer-controlled boundary. Do not post issue content containing real personnel data. Do not enable the prior Render-to-GitHub automatic issue creation. That workflow is deprecated and disabled.
+[Open an issue](https://github.com/SemperAdmin/fitrep-evaluator/issues), or use **Feedback** in the app from a .mil network. Do not post real personnel data in an issue. Report security problems as described in [SECURITY.md](SECURITY.md).
 
-## Charter and Audit Trail
+## License and disclaimer
 
-- PoC-CHARTER.md - The signed PoC charter establishing scope, constraints, and sunset.
-- docs/AUDIT-ISSUES-SUMMARY.md - Historical security audit. Preserved as evidence of the prior posture and as input to the Phase 4 acquisition effort.
+MIT (see [LICENSE](LICENSE)).
 
-## Sunset
+> This is an independent tool built to help Marines with administrative
+> work. It is not an official Department of the Navy or U.S. Marine Corps
+> system and is not endorsed by, affiliated with, or approved by either.
+> Always confirm requirements against the current governing orders.
 
-This PoC sunsets on a date specified in the signed charter, no later than 12 months from the charter date. On sunset, the codebase is archived and the development environment is decommissioned. Any successor system runs under an issued ATO with full RMF, Privacy Act, and CUI controls.
+## Part of Semper Admin
 
-## Distribution Statement
-
-Distribution authorized to U.S. Government agencies and their contractors for administrative or operational use only. Other requests for this document shall be referred to the originating command identified in PoC-CHARTER.md.
-
-## Contact
-
-Project sponsorship inquiries route through the originating command identified in the PoC charter. No public-facing contact channel exists during the PoC phase.
+One of the tools in the Semper Admin suite. Start at the
+[Semper Admin Portal](https://semper-admin-portal.app.cloud.gov) for the
+full set.

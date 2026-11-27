@@ -1,13 +1,13 @@
 # Terms of Service
 
 **Effective Date:** June 2, 2026  
-**Last Updated:** June 2, 2026
+**Last Updated:** November 27, 2026
 
 ## 1. Agreement to Terms
 
 By accessing or using the FITREP Evaluator (hereinafter "the Application"), you agree to be bound by these Terms of Service. If you do not agree to these terms, you must not use this Application.
 
-The Application is a **Proof of Concept**, not a system of record, not authorized for production use, and not a substitute for authorized personnel evaluation processes.
+The Application is publicly hosted. It is a methodology aid, not a system of record, not authorized for production use, and not a substitute for authorized personnel evaluation processes. It is not an official Department of the Navy or U.S. Marine Corps system and is not endorsed by, affiliated with, or approved by either.
 
 ## 2. Definition and Purpose
 
@@ -26,7 +26,7 @@ You agree to:
 - Not enter real performance narratives, comments, directed remarks, or any personally identifiable information
 - Not input any Controlled Unclassified Information (CUI), HIPAA-regulated health information, or classified information
 
-**Violation of these restrictions immediately converts this PoC into an unauthorized system processing government controlled information and triggers incident handling procedures.**
+**Entering real data violates these Terms. Real personnel data does not belong in a publicly hosted application.**
 
 ### 3.2 Prohibited Uses
 
@@ -36,9 +36,6 @@ You agree not to:
 - Attach output to any personnel record or official evaluation
 - Share output containing any real names, ranks, or identifiable information
 - Use the Application methodology without understanding its limitations and assumptions
-- Deploy this Application to any public-facing endpoint or server
-- Modify the Application to persist data, enable network calls, or access real data stores
-- Reverse-engineer, decompile, or extract the evaluation methodology for unauthorized use
 
 ### 3.3 Operational Constraints
 
@@ -98,7 +95,7 @@ You assume all risks associated with:
 - Entering any information into the Application
 - Using the methodology as a basis for evaluation decisions
 - Sharing, storing, or acting on output from the Application
-- Any violation of PoC constraints that converts this tool into an unauthorized system
+- Any violation of these Terms, including entering real data
 
 ## 6. Indemnification
 
@@ -112,17 +109,9 @@ You agree to indemnify and hold harmless the developer and sponsoring command fr
 
 ## 7. Intellectual Property
 
-### 7.1 License Grant
+### 7.1 Source Code
 
-The developer grants you a limited, non-exclusive, non-transferable license to use this Application for the purpose of evaluating the left-to-right marking methodology against the provided synthetic fixture only.
-
-You do **not** own, and the license does not grant you:
-
-- Ownership of the source code
-- Right to modify the Application for deployment
-- Right to reverse-engineer or extract the methodology
-- Right to sublicense or distribute the Application
-- Right to create derivative works
+**Source code.** The source code is published under the MIT License (see the LICENSE file in the repository). Nothing in these terms limits the rights that license grants. These terms govern your use of the hosted Application.
 
 ### 7.2 Trademark and Attribution
 
@@ -130,27 +119,24 @@ The FITREP Evaluator name, logo, and trademarks are the property of the sponsori
 
 ## 8. Confidentiality
 
-The Application and the marked left-to-right methodology are provided under the confidentiality terms of the PoC Charter. You agree:
+The Application is publicly available, and the left-to-right methodology it demonstrates is not confidential. You agree:
 
-- Not to disclose the methodology to unauthorized personnel
-- Not to share the Application code or binary with external parties
-- Not to publish analysis of the methodology without prior approval
 - Not to discuss real command-specific evaluation contexts in relation to this tool
+- Not to present your own statements about the methodology as official guidance
 
-## 9. Termination
+## 9. Changes and Discontinuation
 
-The Application terminates under the sunset provision in **PoC-CHARTER.md**, no later than 12 months from the charter signature date. On sunset:
+The developer may change, suspend, or archive the Application at any time. If the Application is archived:
 
-- The Application is archived
-- Further development ceases
-- The development environment is decommissioned
-- Any successor system operates under a separate ATO with full RMF and Privacy Act controls
+- Further development may cease
+- The hosted copies may be taken down
+- Any successor system would operate under separate terms and authorization
 
-You agree not to continue using an archived or expired Application.
+You agree not to continue using an archived Application.
 
 ## 10. Governing Law and Jurisdiction
 
-These terms are governed by **the laws applicable to U.S. Government operations and the PoC Charter Memo**. Any dispute shall be resolved through the procedures established in the PoC Charter, not through civilian arbitration or litigation.
+These terms are governed by **the laws applicable to U.S. Government operations**. Questions about these terms are raised by opening an issue at https://github.com/SemperAdmin/fitrep-evaluator/issues (do not post real personnel data).
 
 ## 11. Severability
 
@@ -158,7 +144,7 @@ If any provision of these terms is found to be unenforceable, the remaining prov
 
 ## 12. Entire Agreement
 
-These Terms of Service, together with the Privacy Policy, the PoC Charter Memo, and the README.md, constitute the entire agreement between you and the developer regarding the Application. Any prior agreements, understandings, or representations are superseded.
+These Terms of Service, together with the Privacy Policy, the As-Is Disclaimer, and the README.md, constitute the entire agreement between you and the developer regarding the Application. Any prior agreements, understandings, or representations are superseded.
 
 ## 13. Amendment and Updates
 
@@ -170,17 +156,17 @@ Failure to enforce any provision of these terms does not constitute waiver of th
 
 ## 15. Accessibility and Accommodation
 
-The Application is designed to meet WCAG 2.1 Level AA accessibility standards. If you require accommodation to use this Application, contact the originating command identified in the PoC Charter.
+The Application is designed to meet WCAG 2.1 Level AA accessibility standards. If you require accommodation to use this Application, open an issue at https://github.com/SemperAdmin/fitrep-evaluator/issues (do not post real personnel data).
 
 ## 16. Dispute Resolution and Escalation
 
-### 16.1 PoC Charter Disputes
+### 16.1 Disputes
 
-Disputes regarding Application use, constraint violations, or PoC scope are escalated through the procedures in **PoC-CHARTER.md**, not through standard contract dispute mechanisms.
+Questions or disputes regarding Application use or these terms are raised by opening an issue at https://github.com/SemperAdmin/fitrep-evaluator/issues (do not post real personnel data). The original governance record is kept at https://github.com/SemperAdmin/fitrep-evaluator/blob/main/docs/POC-GOVERNANCE.md.
 
 ### 16.2 Incident Reporting
 
-Any violation of the synthetic-data constraint or unauthorized entry of real PII, CUI, or HIPAA information is immediately reported as an incident. The user agrees to full cooperation with incident response procedures.
+If you enter real PII, CUI, or HIPAA information by mistake, reload the page to discard it and do not copy, save, or share any output. Report security concerns as described in SECURITY.md.
 
 ## 17. Third-Party Links
 
@@ -193,7 +179,7 @@ You agree to:
 - Use the Application lawfully and in accordance with all applicable rules of engagement and policies
 - Not attempt to circumvent security controls, network blocks, or data restrictions
 - Not introduce malware, scripts, or modifications that alter the Application's behavior
-- Not attempt to access server resources, logs, or configuration files (none exist in PoC mode)
+- Not attempt to access server resources, logs, or configuration files (none exist in the Application)
 
 ## 19. Feedback and Contributions
 
@@ -205,7 +191,7 @@ If you submit feedback, suggestions, or ideas regarding the Application:
 
 ## 20. Contact for Legal Matters
 
-For questions regarding these Terms of Service, contact the originating command identified in **PoC-CHARTER.md**. This Application has no public-facing legal representative or support line.
+For questions regarding these Terms of Service, open an issue at https://github.com/SemperAdmin/fitrep-evaluator/issues (do not post real personnel data). This Application has no legal representative or support line.
 
 ---
 

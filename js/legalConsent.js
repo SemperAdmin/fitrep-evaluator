@@ -142,10 +142,11 @@
     privacy: `# Privacy Policy
 
 **Effective Date:** June 2, 2026
+**Last Updated:** November 27, 2026
 
 ## 1. Introduction
 
-This Privacy Policy describes how the FITREP Evaluator handles information. This Application is a **Proof of Concept** tool for military fitness report evaluation using **synthetic data only**. It is not authorized to process real PII, CUI, or HIPAA data.
+This Privacy Policy describes how the FITREP Evaluator handles information. This Application is a publicly hosted methodology aid for military fitness report evaluation that works with **synthetic data only**. It is not an official Department of the Navy or U.S. Marine Corps system and is not endorsed by, affiliated with, or approved by either. It is not authorized to process real PII, CUI, or HIPAA data.
 
 ## 2. Data We Collect
 
@@ -165,6 +166,8 @@ All information is stored **in your browser's memory only** during your active s
 
 Your data is automatically deleted when you close the tab, reload the page, or your session expires (default: 30 minutes).
 
+**Hosting.** The hosting platforms (cloud.gov and GitHub Pages) keep standard web server access logs, such as IP address, time, requested page and browser type, for operations and security. Semper Admin does not add tracking of its own.
+
 ## 4. Third-Party Services
 
 **This Application does NOT integrate with any third-party services.** There is no data sharing with:
@@ -181,7 +184,7 @@ Your data is automatically deleted when you close the tab, reload the page, or y
 - Real evaluation periods
 - Real performance narratives
 
-Entering real data violates the PoC Charter and triggers incident procedures.
+Entering real data violates these terms. Real personnel data does not belong in a publicly hosted application.
 
 ## 6. Your Data Rights
 
@@ -193,15 +196,16 @@ Because data is not persisted, deletion requests are not applicable—your data 
 
 **CCPA:** Compliant because no personal information is sold, shared, or retained for longer than the active session.
 
-For questions, contact the originating command in PoC-CHARTER.md.`,
+For questions, open an issue at https://github.com/SemperAdmin/fitrep-evaluator/issues (do not post real personnel data).`,
 
     terms: `# Terms of Service
 
 **Effective Date:** June 2, 2026
+**Last Updated:** November 27, 2026
 
 ## 1. Agreement to Terms
 
-By using the FITREP Evaluator, you agree to these Terms. This is a **Proof of Concept**, not a system of record, and not authorized for production use.
+By using the FITREP Evaluator, you agree to these Terms. The Application is publicly hosted. It is a methodology aid, not a system of record, and not authorized for production use. It is not an official Department of the Navy or U.S. Marine Corps system and is not endorsed by, affiliated with, or approved by either.
 
 ## 2. Purpose
 
@@ -218,7 +222,7 @@ You agree to:
 - Not submit output as official evaluations up the chain of command
 - Not attach output to any personnel record
 
-**Violation immediately converts this PoC into an unauthorized system and triggers incident response.**
+**Entering real data violates these Terms.**
 
 ## 4. Disclaimer of Warranties
 
@@ -238,19 +242,22 @@ You agree to indemnify and hold harmless the developer from any claim arising fr
 - Your violation of these terms
 - Your entry of real PII, CUI, or other controlled information
 
-## 7. Termination
+## 7. Changes and Discontinuation
 
-This PoC sunsets per the signed charter (no later than 12 months from charter date). On sunset, the Application is archived and no further development occurs.
+The developer may change, suspend, or archive the Application at any time. Do not continue to use an archived Application.
 
-For questions, contact the originating command in PoC-CHARTER.md.`,
+For questions, open an issue at https://github.com/SemperAdmin/fitrep-evaluator/issues (do not post real personnel data).`,
 
     disclaimer: `# As-Is Disclaimer
 
 **Effective Date:** June 2, 2026
+**Last Updated:** November 27, 2026
 
 ## Critical Disclaimer
 
-**The FITREP Evaluator is provided "AS-IS" for proof-of-concept evaluation of marking methodology only. It is NOT a system of record, NOT authorized for production use, and does NOT produce official Fitness Reports.**
+**The FITREP Evaluator is provided "AS-IS" for evaluation of marking methodology only. It is NOT a system of record, NOT authorized for production use, and does NOT produce official Fitness Reports.**
+
+It is not an official Department of the Navy or U.S. Marine Corps system and is not endorsed by, affiliated with, or approved by either.
 
 ## What This Application Is
 
@@ -283,7 +290,7 @@ The left-to-right marking methodology:
 
 **You MUST use only the synthetic data fixture.** The fixture contains fictional Marines with placeholder names (e.g., "MARINE_ALPHA_01").
 
-**Entering real PII, CUI, or health information violates the PoC Charter.**
+**Entering real PII, CUI, or health information violates these terms.**
 
 ## Output Disclaimer
 
@@ -311,7 +318,7 @@ You assume all risks. The developer and sponsoring command assume **no liability
 - Misuse or unauthorized use of output
 - Any claim arising from the methodology
 
-For questions, contact the originating command in PoC-CHARTER.md.`
+For questions, open an issue at https://github.com/SemperAdmin/fitrep-evaluator/issues (do not post real personnel data).`
   };
 
   /**
@@ -404,6 +411,7 @@ For questions, contact the originating command in PoC-CHARTER.md.`
                   <li>Do not enter real Marine names, EDIPIs, or PII</li>
                   <li>Output is for methodology evaluation only, not official submission</li>
                   <li>No data persists beyond your session</li>
+                  <li>Not an official Department of the Navy or U.S. Marine Corps system</li>
                   <li>Provided as-is with no warranty</li>
                 </ul>
               </div>
@@ -428,7 +436,7 @@ For questions, contact the originating command in PoC-CHARTER.md.`
                   aria-label="I agree to the Terms of Service"
                 />
                 <span style="flex: 1; line-height: 1.4;">
-                  <strong>I have read and agree to the Terms of Service, Privacy Policy, and As-Is Disclaimer.</strong> I understand that this is a proof-of-concept tool with synthetic data only, and output is not valid for official submission.
+                  <strong>I have read and agree to the Terms of Service, Privacy Policy, and As-Is Disclaimer.</strong> I understand that this tool is for synthetic data only, is not an official Department of the Navy or U.S. Marine Corps system, and its output is not valid for official submission.
                 </span>
               </label>
             </div>
@@ -446,7 +454,7 @@ For questions, contact the originating command in PoC-CHARTER.md.`
             </div>
 
             <p style="font-size: 11px; color: #666; margin-top: 12px; text-align: center;">
-              By clicking "I Accept," you acknowledge you have read the legal documents and agree to operate within PoC constraints.
+              By clicking "I Accept," you acknowledge you have read the legal documents and agree to use synthetic data only.
             </p>
           </div>
         </div>

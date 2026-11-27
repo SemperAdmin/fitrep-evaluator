@@ -18,16 +18,16 @@
   const ACK_HTML = `
     <div class="poc-modal-overlay" id="pocModalOverlay">
       <div class="poc-modal" role="alertdialog" aria-labelledby="pocModalTitle" aria-describedby="pocModalBody">
-        <h2 id="pocModalTitle">Proof of Concept - Acknowledgment Required</h2>
+        <h2 id="pocModalTitle">Synthetic Data Only - Acknowledgment Required</h2>
         <div id="pocModalBody">
-          <p>This tool is a methodology Proof of Concept. It is not a system of record. It is not authorized to process Personally Identifiable Information or Controlled Unclassified Information.</p>
-          <p>By proceeding, you acknowledge the following constraints under the signed PoC Charter Memo:</p>
+          <p>This tool is a publicly hosted methodology aid. It is not a system of record and not an official Department of the Navy or U.S. Marine Corps system. It is not authorized to process Personally Identifiable Information or Controlled Unclassified Information.</p>
+          <p>By proceeding, you acknowledge the following constraints:</p>
           <ul>
             <li>No real Marine names, EDIPIs, ranks tied to identifiable individuals, or evaluation periods.</li>
             <li>No real performance narratives, comments, or directed remarks.</li>
             <li>Use only the synthetic data fixture loaded with this application.</li>
             <li>Outputs are not submitted up the chain of command and are not attached to any authorized Fitness Report.</li>
-            <li>Violation converts this PoC into an unauthorized live system and triggers incident handling.</li>
+            <li>Real data does not belong in this application. Do not enter it.</li>
           </ul>
           <p><strong>If you cannot operate within these constraints, close this page now.</strong></p>
         </div>
@@ -37,8 +37,8 @@
   `;
 
   const BANNER_HTML = `
-    <div class="poc-banner" role="banner" aria-label="Proof of Concept Warning">
-      <span class="poc-banner__title">UNCLASSIFIED &middot; PROOF OF CONCEPT &middot; METHODOLOGY AID ONLY &middot; SYNTHETIC DATA ONLY</span>
+    <div class="poc-banner" role="banner" aria-label="Synthetic Data Only Warning">
+      <span class="poc-banner__title">UNCLASSIFIED &middot; METHODOLOGY AID ONLY &middot; SYNTHETIC DATA ONLY &middot; NOT AN OFFICIAL SYSTEM</span>
     </div>
   `;
 
