@@ -36,8 +36,6 @@ You agree not to:
 - Attach output to any personnel record or official evaluation
 - Share output containing any real names, ranks, or identifiable information
 - Use the Application methodology without understanding its limitations and assumptions
-- Modify the Application to persist data, enable network calls, or access real data stores
-- Reverse-engineer, decompile, or extract the evaluation methodology for unauthorized use
 
 ### 3.3 Operational Constraints
 
@@ -111,17 +109,9 @@ You agree to indemnify and hold harmless the developer and sponsoring command fr
 
 ## 7. Intellectual Property
 
-### 7.1 License Grant
+### 7.1 Source Code
 
-The developer grants you a limited, non-exclusive, non-transferable license to use this Application for the purpose of evaluating the left-to-right marking methodology against the provided synthetic fixture only.
-
-You do **not** own, and the license does not grant you:
-
-- Ownership of the source code
-- Right to modify the Application for deployment
-- Right to reverse-engineer or extract the methodology
-- Right to sublicense or distribute the Application
-- Right to create derivative works
+**Source code.** The source code is published under the MIT License (see the LICENSE file in the repository). Nothing in these terms limits the rights that license grants. These terms govern your use of the hosted Application.
 
 ### 7.2 Trademark and Attribution
 
@@ -146,7 +136,7 @@ You agree not to continue using an archived Application.
 
 ## 10. Governing Law and Jurisdiction
 
-These terms are governed by **applicable United States federal law**. Questions about these terms are raised by opening an issue at https://github.com/SemperAdmin/fitrep-evaluator/issues (do not post real personnel data).
+These terms are governed by **the laws applicable to U.S. Government operations**. Questions about these terms are raised by opening an issue at https://github.com/SemperAdmin/fitrep-evaluator/issues (do not post real personnel data).
 
 ## 11. Severability
 

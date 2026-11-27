@@ -5,13 +5,13 @@
 
 ## 1. Introduction
 
-This Privacy Policy describes how the FITREP Evaluator (hereinafter "the Application") collects, uses, and protects information. This Application is a **Proof of Concept** tool designed to aid in military fitness report evaluation methodology using **synthetic data only**. It is not authorized to process, store, or transmit real Personally Identifiable Information (PII), Controlled Unclassified Information (CUI), or health information.
+This Privacy Policy describes how the FITREP Evaluator (hereinafter "the Application") collects, uses, and protects information. This Application is a publicly hosted tool designed to aid in military fitness report evaluation methodology using **synthetic data only**. It is not authorized to process, store, or transmit real Personally Identifiable Information (PII), Controlled Unclassified Information (CUI), or health information.
 
 ## 2. Scope and Applicability
 
-This Privacy Policy applies to all users of the FITREP Evaluator PoC. By using this Application, you acknowledge that:
+This Privacy Policy applies to all users of the FITREP Evaluator. By using this Application, you acknowledge that:
 
-- You understand this is a proof-of-concept tool, not a system of record.
+- You understand this is a reference tool, not a system of record.
 - You will not enter real Marine names, EDIPIs, ranks tied to identifiable individuals, evaluation periods, or performance narratives.
 - You will use only the synthetic data fixture provided with this Application.
 
@@ -117,7 +117,7 @@ All data collection and persistence mechanisms (localStorage, sessionStorage, fe
 
 The fixture contains fictional Marines with placeholder identifiers (e.g., "MARINE_ALPHA_01", "MARINE_BRAVO_02") and is the only acceptable input source.
 
-**Entering real data is a violation of the PoC Charter and converts this tool into an unauthorized system processing government controlled information.** Violations trigger incident response procedures.
+**Entering real data is a misuse of this tool, which is not an authorized system for government controlled information.** If you enter real data by mistake, reload the page to discard it.
 
 ## 9. Synthetic Data Disclaimer
 
@@ -168,7 +168,7 @@ Because this Application collects no persistent personal data, there is no data 
 
 ## 14. Contact and Complaints
 
-For privacy questions or complaints, contact the originating command identified in **PoC-CHARTER.md**. This is a developer-controlled proof-of-concept tool with no public-facing privacy office.
+For privacy questions or complaints, open an issue at https://github.com/SemperAdmin/fitrep-evaluator/issues (do not post real personnel data). This tool has no dedicated privacy office.
 
 **This Application is not subject to standard Privacy Act procedures or FOIA requests.**
 
