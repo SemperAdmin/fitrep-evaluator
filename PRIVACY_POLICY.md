@@ -1,7 +1,7 @@
 # Privacy Policy
 
 **Effective Date:** June 2, 2026  
-**Last Updated:** June 2, 2026
+**Last Updated:** November 27, 2026
 
 ## 1. Introduction
 
@@ -33,12 +33,14 @@ When you use the evaluation methodology in the Application, you may enter the fo
 This Application does **not** automatically collect:
 
 - Browser type, operating system, or device identifiers
-- IP addresses or geolocation data
+- IP addresses or geolocation data (the Application itself does not; see Hosting below)
 - Cookies or persistent identifiers
 - Behavioral analytics or usage patterns
 - Session tokens or authentication credentials
 
 **Why?** All network calls (fetch, XMLHttpRequest, WebSocket) are blocked at the browser level. No telemetry is sent to any server.
+
+**Hosting.** The hosting platforms (cloud.gov and GitHub Pages) keep standard web server access logs, such as IP address, time, requested page and browser type, for operations and security. Semper Admin does not add tracking of its own.
 
 ## 4. Storage and Data Retention
 
